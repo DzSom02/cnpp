@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinese Minimal Pair Practice</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-8 text-center">
+                <h1>Chinese Minimal Pair Practice Level 2</h1>
+                <div class="mb-3">
+                    <input type="text" id="inputText" placeholder="Enter text here">
+                    <button id="generateButton">Generate</button>
+                </div>
+                <p id="outputText"></p>
+            </div>
+            <div class="col-md-4">
+                <div class="side-panel">
+                    <h3>Difference between</h3>
+                    <table class="table table-bordered">
+                       <tbody>
+                            <tr>
+                                <td>jian</td>
+                                <td>qian</td>
+                                <td>si</td>
+                            </tr>
+                            <tr>
+                                <td>qi</td>
+                                <td>xi</td>
+                                <td>zhi</td>
+                            </tr>
+                            <tr>
+                                <td>zi</td>
+                                <td>chi</td>
+                                <td>ji</td>
+                            </tr>
+                            <tr>
+                                <td>qing</td>
+                                <td>xing</td>
+                                <td>xin</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const pinyinList = ['jian', 'qian', 'si', 'qi', 'xi', 'zhi', 'zi', 'chi', 'ji', 'qing', 'xing', 'xin'];
+
+        function getRandomPinyin() {
+            return pinyinList[Math.floor(Math.random() * pinyinList.length)];
+        }
+
+        document.getElementById('generateButton').addEventListener('click', () => {
+            const pinyin1 = getRandomPinyin();
+            let pinyin2;
+            do {
+                pinyin2 = getRandomPinyin();
+            } while (pinyin1 === pinyin2); // Ensure pinyin2 is different from pinyin1
+
+            document.getElementById('outputText').textContent = pinyin1 + " " + pinyin2;
+        });
+    </script>
+</body>
+</html>
+
