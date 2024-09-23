@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const optionsDiv = document.getElementById('options');
   const message = document.getElementById('message');
   const statsDiv = document.getElementById('stats');
+  const allStatsDiv = document.getElementById('allStats');
 
   // List of word pairs (each pair contains two Pinyin syllables)
   const wordPairs = [
@@ -86,23 +87,45 @@ document.addEventListener('DOMContentLoaded', function () {
       statistics[currentPair.join(' vs ')].incorrect++;
     }
     statistics[currentPair.join(' vs ')].total++;
-    updateStatistics();
+    updateAllStatistics();
   }
 
-  // Update statistics display
-  function updateStatistics() {
-    const pairStats = statistics[currentPair.join(' vs ')];
-    const correctPercentage = pairStats.total ? ((pairStats.correct / pairStats.total) * 100).toFixed(2) : 0;
+  // Update statistics display for all pairs in a table format, showing only practiced pairs
+  function updateAllStatistics() {
+    allStatsDiv.innerHTML = "<h5>All Pairs Statistics</h5>";
+    const allStatsTable = document.createElement('table');
+    allStatsTable.classList.add('table', 'table-bordered', 'table-striped');
   
-    statsDiv.innerHTML = `
-      <h5>Statistics for ${currentPair.join(' vs ')}</h5>
-      <ul class="list-group">
-        <li class="list-group-item">Correct: <strong>${pairStats.correct}</strong></li>
-        <li class="list-group-item">Incorrect: <strong>${pairStats.incorrect}</strong></li>
-        <li class="list-group-item">Total Attempts: <strong>${pairStats.total}</strong></li>
-        <li class="list-group-item">Correct Percentage: <strong>${correctPercentage}%</strong></li>
-      </ul>
+    // Create table header
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `
+      <th>Word Pair</th>
+      <th>Correct</th>
+      <th>Incorrect</th>
+      <th>Total Attempts</th>
+      <th>Correct Percentage</th>
     `;
+    allStatsTable.appendChild(headerRow);
+  
+    for (const pair in statistics) {
+      const stats = statistics[pair];
+      // Only show pairs with at least one attempt
+      if (stats.total > 0) {
+        const correctPercentage = ((stats.correct / stats.total) * 100).toFixed(2);
+        
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pair}</td>
+          <td>${stats.correct}</td>
+          <td>${stats.incorrect}</td>
+          <td>${stats.total}</td>
+          <td>${correctPercentage}%</td>
+        `;
+        allStatsTable.appendChild(row);
+      }
+    }
+  
+    allStatsDiv.appendChild(allStatsTable);
   }
 
   // Enable play button and generate word options when a pair is selected
@@ -113,12 +136,11 @@ document.addEventListener('DOMContentLoaded', function () {
       playButton.disabled = false;
       generateOptions(currentPair);
       message.textContent = "";
-      updateStatistics();  // Update stats when the pair changes
+      updateAllStatistics(); // Update all stats when the pair changes
     }
   });
 
   // Initialize the word pair dropdown
   populatePairSelect();
 });
-
 
