@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const playButton = document.getElementById('playButton');
   const optionsDiv = document.getElementById('options');
   const message = document.getElementById('message');
+  const statsDiv = document.getElementById('stats');
 
   // List of word pairs (each pair contains two Pinyin syllables)
   const wordPairs = [
@@ -15,6 +16,18 @@ document.addEventListener('DOMContentLoaded', function () {
   let currentPair = null;
   let currentWord = "";  // Stores the word of the currently playing audio
   let currentWordTone = "";  // Stores the word of the currently playing audio
+
+  // Statistics object to track each pair
+  const statistics = {};
+
+  // Initialize statistics for each pair
+  wordPairs.forEach(pair => {
+    statistics[pair.join(' vs ')] = {
+      correct: 0,
+      incorrect: 0,
+      total: 0
+    };
+  });
 
   // Populate the pair dropdown
   function populatePairSelect() {
@@ -65,11 +78,29 @@ document.addEventListener('DOMContentLoaded', function () {
       message.textContent = "Correct!";
       message.classList.add("text-success");
       message.classList.remove("text-danger");
+      statistics[currentPair.join(' vs ')].correct++;
     } else {
       message.textContent = `Incorrect. It was "${currentWordTone}".`;
       message.classList.add("text-danger");
       message.classList.remove("text-success");
+      statistics[currentPair.join(' vs ')].incorrect++;
     }
+    statistics[currentPair.join(' vs ')].total++;
+    updateStatistics();
+  }
+
+  // Update statistics display
+  function updateStatistics() {
+    const pairStats = statistics[currentPair.join(' vs ')];
+    const correctPercentage = pairStats.total ? ((pairStats.correct / pairStats.total) * 100).toFixed(2) : 0;
+
+    statsDiv.textContent = `
+      ${currentPair.join(' vs ')}: 
+      Correct: ${pairStats.correct}, 
+      Incorrect: ${pairStats.incorrect}, 
+      Total: ${pairStats.total}, 
+      Correct Percentage: ${correctPercentage}%
+    `;
   }
 
   // Enable play button and generate word options when a pair is selected
