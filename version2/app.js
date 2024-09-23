@@ -74,8 +74,12 @@ document.addEventListener('DOMContentLoaded', function () {
       let button = document.createElement('button');
       button.classList.add('btn', 'btn-secondary', 'm-2');
       button.textContent = word;
+      button.disabled = true; // Disable buttons initially
       button.addEventListener('click', function () {
         checkAnswer(word);
+        // Disable buttons after one is clicked
+        const buttons = optionsDiv.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = true);
       });
       optionsDiv.appendChild(button);
     });
@@ -94,6 +98,10 @@ document.addEventListener('DOMContentLoaded', function () {
       audio.play();
 
       message.textContent = "Listen carefully!";
+
+      // Enable the buttons after the audio is played
+      const buttons = optionsDiv.querySelectorAll('button');
+      buttons.forEach(button => button.disabled = false);
     } else {
       message.textContent = "Please select a word pair.";
     }
