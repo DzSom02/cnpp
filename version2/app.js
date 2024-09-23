@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const optionsDiv = document.getElementById('options');
   const message = document.getElementById('message');
   const allStatsDiv = document.getElementById('allStats');
+  const deleteStatsButton = document.getElementById('deleteStatsButton'); // New button
 
   // List of word pairs (each pair contains two Pinyin syllables)
   const wordPairs = [
@@ -51,6 +52,18 @@ document.addEventListener('DOMContentLoaded', function () {
   // Save statistics to localStorage
   function saveStatistics() {
     localStorage.setItem('pinyinStatistics', JSON.stringify(statistics));
+  }
+
+  // Delete all statistics
+  function deleteStatistics() {
+    if (confirm("Are you sure you want to delete all statistics? This action cannot be undone.")) {
+      for (const pair in statistics) {
+        statistics[pair] = { correct: 0, incorrect: 0, total: 0 };
+      }
+      saveStatistics();
+      updateAllStatistics();
+      message.textContent = "All statistics have been reset.";
+    }
   }
 
   // Generate the word buttons for the selected pair
@@ -154,6 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {
       updateAllStatistics(); // Update all stats when the pair changes
     }
   });
+
+  // Add event listener for delete stats button
+  deleteStatsButton.addEventListener('click', deleteStatistics);
 
   // Initialize the word pair dropdown
   populatePairSelect();
