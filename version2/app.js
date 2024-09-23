@@ -9,7 +9,23 @@ document.addEventListener('DOMContentLoaded', function () {
   // List of word pairs (each pair contains two Pinyin syllables)
   const wordPairs = [
     ["zhong", "cong"],
-    ["shi", "si"]
+    ["shi", "si"],
+    ["zi", "zhi"],
+    ["jian", "qian"],
+    ["zi", "ji"],
+    ["zhi", "ji"],
+    ["xi", "si"],
+    ["xi", "ji"],
+    ["chi", "si"],
+    ["chi", "xi"],
+    ["chi", "zhi"],
+    ["chi", "ji"],
+    ["wan", "guan"],
+    ["chu", "qu"],
+    ["zhu", "qu"],
+    ["zhu", "chu"],
+    ["zai", "cai"]
+
     // Add more pairs as needed
   ];
 
