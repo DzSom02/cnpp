@@ -4,38 +4,33 @@ document.addEventListener('DOMContentLoaded', function () {
   const optionsDiv = document.getElementById('options');
   const message = document.getElementById('message');
 
-  // Example word pairs and corresponding audio files
-  const wordPairs = {
-    "zhong vs cong": {
-      "zhong": ["./audios/zhong1.mp3", "./audios/zhong2.mp3", "./audios/zhong3.mp3", "./audios/zhong4.mp3"],
-      "cong": ["./audios/cong1.mp3", "./audios/cong2.mp3", "./audios/cong3.mp3", "./audios/cong4.mp3"]
-    },
-    "shi vs si": {
-      "shi": ["./audios/shi1.mp3", "./audios/shi2.mp3", "./audios/shi3.mp3", "./audios/shi4.mp3"],
-      "si": ["./audios/si1.mp3", "./audios/si2.mp3", "./audios/si3.mp3", "./audios/si4.mp3"]
-    }
+  // List of word pairs (each pair contains two Pinyin syllables)
+  const wordPairs = [
+    ["zhong", "cong"],
+    ["shi", "si"]
     // Add more pairs as needed
-  };
+  ];
 
+  const audioFolder = "./audios/";
   let currentPair = null;
   let currentWord = "";  // Stores the word of the currently playing audio
+  let currentWordTone = "";  // Stores the word of the currently playing audio
 
   // Populate the pair dropdown
   function populatePairSelect() {
-    for (const pair in wordPairs) {
+    wordPairs.forEach(pair => {
       let option = document.createElement('option');
-      option.value = pair;
-      option.textContent = pair;
+      option.value = pair.join(' vs '); // Display format
+      option.textContent = pair.join(' vs '); // Display format
       pairSelect.appendChild(option);
-    }
+    });
   }
 
   // Generate the word buttons for the selected pair
   function generateOptions(pair) {
     optionsDiv.innerHTML = ""; // Clear previous options
 
-    const words = Object.keys(wordPairs[pair]);
-    words.forEach(word => {
+    pair.forEach(word => {
       let button = document.createElement('button');
       button.classList.add('btn', 'btn-secondary', 'm-2');
       button.textContent = word;
@@ -49,10 +44,11 @@ document.addEventListener('DOMContentLoaded', function () {
   // Play random audio and set the correct word
   playButton.addEventListener('click', function () {
     if (currentPair) {
-      const words = Object.keys(wordPairs[currentPair]);
-      const randomWord = words[Math.floor(Math.random() * words.length)];
-      const randomAudio = wordPairs[currentPair][randomWord][Math.floor(Math.random() * wordPairs[currentPair][randomWord].length)];
+      const randomWord = currentPair[Math.floor(Math.random() * currentPair.length)];
+      const randomTone = Math.floor(Math.random() * 4) + 1; // Random tone 1 to 4
+      const randomAudio = `${audioFolder}${randomWord}${randomTone}.mp3`;
       currentWord = randomWord;
+      currentWordTone = `${randomWord}${randomTone}`;
 
       const audio = new Audio(randomAudio);
       audio.play();
@@ -70,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
       message.classList.add("text-success");
       message.classList.remove("text-danger");
     } else {
-      message.textContent = `Incorrect. It was "${currentWord}".`;
+      message.textContent = `Incorrect. It was "${currentWordTone}".`;
       message.classList.add("text-danger");
       message.classList.remove("text-success");
     }
@@ -78,8 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Enable play button and generate word options when a pair is selected
   pairSelect.addEventListener('change', function () {
-    currentPair = pairSelect.value;
-    if (currentPair !== "none") {
+    const selectedValue = pairSelect.value.split(' vs ');
+    currentPair = selectedValue;
+    if (currentPair.length === 2) {
       playButton.disabled = false;
       generateOptions(currentPair);
       message.textContent = "";
