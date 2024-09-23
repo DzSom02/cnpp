@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const playButton = document.getElementById('playButton');
   const optionsDiv = document.getElementById('options');
   const message = document.getElementById('message');
-  const statsDiv = document.getElementById('stats');
   const allStatsDiv = document.getElementById('allStats');
 
   // List of word pairs (each pair contains two Pinyin syllables)
@@ -18,17 +17,8 @@ document.addEventListener('DOMContentLoaded', function () {
   let currentWord = "";  // Stores the word of the currently playing audio
   let currentWordTone = "";  // Stores the word of the currently playing audio
 
-  // Statistics object to track each pair
-  const statistics = {};
-
-  // Initialize statistics for each pair
-  wordPairs.forEach(pair => {
-    statistics[pair.join(' vs ')] = {
-      correct: 0,
-      incorrect: 0,
-      total: 0
-    };
-  });
+  // Load statistics from localStorage or initialize
+  const statistics = loadStatistics();
 
   // Populate the pair dropdown
   function populatePairSelect() {
@@ -38,6 +28,29 @@ document.addEventListener('DOMContentLoaded', function () {
       option.textContent = pair.join(' vs '); // Display format
       pairSelect.appendChild(option);
     });
+  }
+
+  // Initialize statistics for each pair if not already done
+  wordPairs.forEach(pair => {
+    const pairKey = pair.join(' vs ');
+    if (!statistics[pairKey]) {
+      statistics[pairKey] = {
+        correct: 0,
+        incorrect: 0,
+        total: 0
+      };
+    }
+  });
+
+  // Load statistics from localStorage
+  function loadStatistics() {
+    const savedStats = localStorage.getItem('pinyinStatistics');
+    return savedStats ? JSON.parse(savedStats) : {};
+  }
+
+  // Save statistics to localStorage
+  function saveStatistics() {
+    localStorage.setItem('pinyinStatistics', JSON.stringify(statistics));
   }
 
   // Generate the word buttons for the selected pair
@@ -75,18 +88,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // Check if the selected word is correct
   function checkAnswer(selectedWord) {
+    const pairKey = currentPair.join(' vs ');
     if (selectedWord === currentWord) {
       message.textContent = "Correct!";
       message.classList.add("text-success");
       message.classList.remove("text-danger");
-      statistics[currentPair.join(' vs ')].correct++;
+      statistics[pairKey].correct++;
     } else {
       message.textContent = `Incorrect. It was "${currentWordTone}".`;
       message.classList.add("text-danger");
       message.classList.remove("text-success");
-      statistics[currentPair.join(' vs ')].incorrect++;
+      statistics[pairKey].incorrect++;
     }
-    statistics[currentPair.join(' vs ')].total++;
+    statistics[pairKey].total++;
+    saveStatistics(); // Save updated statistics
     updateAllStatistics();
   }
 
