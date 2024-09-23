@@ -93,13 +93,15 @@ document.addEventListener('DOMContentLoaded', function () {
   function updateStatistics() {
     const pairStats = statistics[currentPair.join(' vs ')];
     const correctPercentage = pairStats.total ? ((pairStats.correct / pairStats.total) * 100).toFixed(2) : 0;
-
-    statsDiv.textContent = `
-      ${currentPair.join(' vs ')}: 
-      Correct: ${pairStats.correct}, 
-      Incorrect: ${pairStats.incorrect}, 
-      Total: ${pairStats.total}, 
-      Correct Percentage: ${correctPercentage}%
+  
+    statsDiv.innerHTML = `
+      <h5>Statistics for ${currentPair.join(' vs ')}</h5>
+      <ul class="list-group">
+        <li class="list-group-item">Correct: <strong>${pairStats.correct}</strong></li>
+        <li class="list-group-item">Incorrect: <strong>${pairStats.incorrect}</strong></li>
+        <li class="list-group-item">Total Attempts: <strong>${pairStats.total}</strong></li>
+        <li class="list-group-item">Correct Percentage: <strong>${correctPercentage}%</strong></li>
+      </ul>
     `;
   }
 
@@ -111,10 +113,12 @@ document.addEventListener('DOMContentLoaded', function () {
       playButton.disabled = false;
       generateOptions(currentPair);
       message.textContent = "";
+      updateStatistics();  // Update stats when the pair changes
     }
   });
 
   // Initialize the word pair dropdown
   populatePairSelect();
 });
+
 
