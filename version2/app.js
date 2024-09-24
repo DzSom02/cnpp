@@ -142,12 +142,11 @@ document.addEventListener('DOMContentLoaded', function () {
     updateAllStatistics();
   }
 
-  // Update statistics display for all pairs in a table format, showing only practiced pairs
   function updateAllStatistics() {
     allStatsDiv.innerHTML = "<h5>All Pairs Statistics</h5>";
     const allStatsTable = document.createElement('table');
     allStatsTable.classList.add('table', 'table-bordered', 'table-striped');
-  
+    
     // Create table header
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = `
@@ -159,13 +158,23 @@ document.addEventListener('DOMContentLoaded', function () {
     `;
     allStatsTable.appendChild(headerRow);
   
+    // Loop through the statistics and render the rows
     for (const pair in statistics) {
       const stats = statistics[pair];
+      
       // Only show pairs with at least one attempt
       if (stats.total > 0) {
         const correctPercentage = ((stats.correct / stats.total) * 100).toFixed(2);
         
         const row = document.createElement('tr');
+  
+        // If the current pair matches, add a highlight class or style
+        if (pair === currentPair.join(' vs ')) {
+          row.style.backgroundColor = '#d9edf7'; // Bootstrap class for highlighting
+          // Alternatively, you can use an inline style like:
+          // row.style.backgroundColor = '#d9edf7';  // Light blue highlight
+        }
+  
         row.innerHTML = `
           <td>${pair}</td>
           <td>${stats.correct}</td>
