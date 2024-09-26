@@ -1,26 +1,27 @@
 // List of words with tone pairs (same as before)
 const wordSet = [
-  { "tones": "1,1", "word": "中心", "audio_url": "tone_pairs/中心.mp3" },
-  { "tones": "1,2", "word": "中文", "audio_url": "tone_pairs/中文.mp3" },
-  { "tones": "1,3", "word": "分享", "audio_url": "tone_pairs/分享.mp3" },
-  { "tones": "1,4", "word": "发现", "audio_url": "tone_pairs/发现.mp3" },
-  { "tones": "1,neutral", "word": "休息", "audio_url": "tone_pairs/休息.mp3" },
-  { "tones": "2,1", "word": "原因", "audio_url": "tone_pairs/原因.mp3" },
-  { "tones": "2,2", "word": "其实", "audio_url": "tone_pairs/其实.mp3" },
-  { "tones": "2,3", "word": "如果", "audio_url": "tone_pairs/如果.mp3" },
-  { "tones": "2,4", "word": "图片", "audio_url": "tone_pairs/图片.mp3" },
-  { "tones": "2,neutral", "word": "便宜", "audio_url": "tone_pairs/便宜.mp3" },
-  { "tones": "3,1", "word": "取消", "audio_url": "tone_pairs/取消.mp3" },
-  { "tones": "3,2", "word": "友情", "audio_url": "tone_pairs/友情.mp3" },
-  { "tones": "3,3", "word": "你好", "audio_url": "tone_pairs/你好.mp3" },
-  { "tones": "3,4", "word": "保证", "audio_url": "tone_pairs/保证.mp3" },
-  { "tones": "3,neutral", "word": "小姐", "audio_url": "tone_pairs/小姐.mp3" },
-  { "tones": "4,1", "word": "信箱", "audio_url": "tone_pairs/信箱.mp3" },
-  { "tones": "4,2", "word": "内容", "audio_url": "tone_pairs/内容.mp3" },
-  { "tones": "4,3", "word": "作者", "audio_url": "tone_pairs/作者.mp3" },
-  { "tones": "4,4", "word": "但是", "audio_url": "tone_pairs/但是.mp3" },
-  { "tones": "4,neutral", "word": "困难", "audio_url": "tone_pairs/困难.mp3" }
+  { "tones": "1,1", "word": "中心", "pinyin": "zhōng xīn", "pinyin_no_tones": "zhong xin" },
+  { "tones": "1,2", "word": "中文", "pinyin": "zhōng wén", "pinyin_no_tones": "zhong wen" },
+  { "tones": "1,3", "word": "分享", "pinyin": "fēn xiǎng", "pinyin_no_tones": "fen xiang" },
+  { "tones": "1,4", "word": "发现", "pinyin": "fā xiàn", "pinyin_no_tones": "fa xian" },
+  { "tones": "1,neutral", "word": "休息", "pinyin": "xiū xi", "pinyin_no_tones": "xiu xi" },
+  { "tones": "2,1", "word": "原因", "pinyin": "yuán yīn", "pinyin_no_tones": "yuan yin" },
+  { "tones": "2,2", "word": "其实", "pinyin": "qí shí", "pinyin_no_tones": "qi shi" },
+  { "tones": "2,3", "word": "如果", "pinyin": "rú guǒ", "pinyin_no_tones": "ru guo" },
+  { "tones": "2,4", "word": "图片", "pinyin": "tú piàn", "pinyin_no_tones": "tu pian" },
+  { "tones": "2,neutral", "word": "便宜", "pinyin": "pián yí", "pinyin_no_tones": "pian yi" },
+  { "tones": "3,1", "word": "取消", "pinyin": "qǔ xiāo", "pinyin_no_tones": "qu xiao" },
+  { "tones": "3,2", "word": "友情", "pinyin": "yǒu qíng", "pinyin_no_tones": "you qing" },
+  { "tones": "3,3", "word": "你好", "pinyin": "nǐ hǎo", "pinyin_no_tones": "ni hao" },
+  { "tones": "3,4", "word": "保证", "pinyin": "bǎo zhèng", "pinyin_no_tones": "bao zheng" },
+  { "tones": "3,neutral", "word": "小姐", "pinyin": "xiǎo jiě", "pinyin_no_tones": "xiao jie" },
+  { "tones": "4,1", "word": "信箱", "pinyin": "xìn xiāng", "pinyin_no_tones": "xin xiang" },
+  { "tones": "4,2", "word": "内容", "pinyin": "nèi róng", "pinyin_no_tones": "nei rong" },
+  { "tones": "4,3", "word": "作者", "pinyin": "zuò zhě", "pinyin_no_tones": "zuo zhe" },
+  { "tones": "4,4", "word": "但是", "pinyin": "dàn shì", "pinyin_no_tones": "dan shi" },
+  { "tones": "4,neutral", "word": "困难", "pinyin": "kùn nán", "pinyin_no_tones": "kun nan" }
 ];
+
 
 // Possible tone pairs for rendering the table
 const initialTones = ["1", "2", "3", "4"];
@@ -49,11 +50,16 @@ let selectedWord; // The current word to guess
 function selectRandomWord() {
   const randomIndex = Math.floor(Math.random() * wordSet.length);
   selectedWord = wordSet[randomIndex];
+
+  // Display the selected word and pinyin (without tones)
+  document.getElementById('selected-word').innerText = `Word: ${selectedWord.word}`;
+  document.getElementById('selected-pinyin').innerText = `Pinyin: ${selectedWord.pinyin_no_tones}`;
 }
 
-// Function to play the audio
+// Function to play the audio by generating the path dynamically
 function playAudio() {
-  const audio = new Audio(selectedWord.audio_url);
+  const audioPath = `tone_pairs/${selectedWord.word}.mp3`; // Generate the path
+  const audio = new Audio(audioPath);
   audio.play();
 }
 
@@ -86,14 +92,12 @@ function checkAnswer(selectedTone) {
   // Update stats
   stats[selectedTone].tries++;
   
-  if (selectedTone === correctTone) {
-    stats[selectedTone].successes++;
+  if (selectedTone === selectedWord.tones) {
     resultMsg.className = 'alert alert-success';
-    resultMsg.innerHTML = `Correct! The word was <strong>${selectedWord.word}</strong> with tone pair ${correctTone}.`;
+    resultMsg.innerText = 'Correct! You guessed the right tone pair!';
   } else {
-    stats[selectedTone].failures++;
     resultMsg.className = 'alert alert-danger';
-    resultMsg.innerHTML = `Wrong! The correct tone pair was <strong>${correctTone}</strong>. The word was <strong>${selectedWord.word}</strong>.`;
+    resultMsg.innerText = `Wrong! The correct tone pair was ${selectedWord.tones}. Pinyin: ${selectedWord.pinyin}`;
   }
 
   resultMsg.classList.remove('d-none');
