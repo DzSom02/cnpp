@@ -22,13 +22,9 @@ const wordSet = [
   { "tones": "4,neutral", "word": "困难", "audio_url": "tone_pairs/困难.mp3" }
 ];
 
-// Possible tone pairs
-const tonePairs = [
-  "1,1", "1,2", "1,3", "1,4", "1,neutral",
-  "2,1", "2,2", "2,3", "2,4", "2,neutral",
-  "3,1", "3,2", "3,3", "3,4", "3,neutral",
-  "4,1", "4,2", "4,3", "4,4", "4,neutral"
-];
+// Possible tone pairs for rendering the table
+const initialTones = ["1", "2", "3", "4"];
+const finalTones = ["1", "2", "3", "4", "neutral"];
 
 let selectedWord; // The current word to guess
 
@@ -49,14 +45,18 @@ function renderToneOptions() {
   const tableBody = document.getElementById('tone-table');
   tableBody.innerHTML = ''; // Clear previous options
 
-  tonePairs.forEach(tone => {
+  initialTones.forEach(initialTone => {
     const row = document.createElement('tr');
-    const cell = document.createElement('td');
-    cell.colSpan = 2;
-    cell.innerText = tone;
-    cell.classList.add('table-cell');
-    cell.onclick = () => checkAnswer(tone);
-    row.appendChild(cell);
+   
+    finalTones.forEach(finalTone => {
+      const tonePair = `${initialTone},${finalTone}`;
+      const cell = document.createElement('td');
+      cell.innerText = tonePair;
+      cell.classList.add('table-cell');
+      cell.onclick = () => checkAnswer(tonePair);
+      row.appendChild(cell);
+    });
+
     tableBody.appendChild(row);
   });
 }
