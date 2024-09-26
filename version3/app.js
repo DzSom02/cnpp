@@ -53,6 +53,7 @@ function selectRandomWord() {
 
 // Function to play the audio
 function playAudio() {
+  selectRandomWord();  // Select a new random word every time the button is pressed
   const audio = new Audio(selectedWord.audio_url);
   audio.play();
 }
@@ -100,24 +101,31 @@ function checkAnswer(selectedTone) {
   updateStatistics();
 }
 
-// Function to update statistics display
+// Function to update statistics display in table form
 function updateStatistics() {
-  const statsContainer = document.getElementById('stats');
-  statsContainer.innerHTML = ''; // Clear previous stats
+  const statsTable = document.getElementById('stats-table-body');
+  statsTable.innerHTML = ''; // Clear previous stats
 
   Object.keys(stats).forEach(tonePair => {
     const { tries, successes, failures } = stats[tonePair];
     const percentage = tries > 0 ? ((successes / tries) * 100).toFixed(2) : 0;
-    const statRow = document.createElement('p');
-    statRow.innerHTML = `Tone Pair ${tonePair}: Tries = ${tries}, Successes = ${successes}, Failures = ${failures}, Success Rate = ${percentage}%`;
-    statsContainer.appendChild(statRow);
+    
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${tonePair}</td>
+      <td>${tries}</td>
+      <td>${successes}</td>
+      <td>${failures}</td>
+      <td>${percentage}%</td>
+    `;
+    
+    statsTable.appendChild(row);
   });
 }
 
 // Initialize the game
 function initGame() {
   initializeStats(); // Initialize stats for all tone pairs
-  selectRandomWord();
   renderToneOptions();
   const resultMsg = document.getElementById('result-msg');
   resultMsg.classList.add('d-none'); // Hide result message
