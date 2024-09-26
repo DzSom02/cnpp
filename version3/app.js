@@ -1,4 +1,4 @@
-// List of words with tone pairs (from the previously provided list)
+// List of words with tone pairs (same as before)
 const wordSet = [
   { "tones": "1,1", "word": "中心", "audio_url": "tone_pairs/中心.mp3" },
   { "tones": "1,2", "word": "中文", "audio_url": "tone_pairs/中文.mp3" },
@@ -26,6 +26,23 @@ const wordSet = [
 const initialTones = ["1", "2", "3", "4"];
 const finalTones = ["1", "2", "3", "4", "neutral"];
 
+// Track statistics
+let stats = {};
+
+// Initialize the stats object for each tone pair
+function initializeStats() {
+  initialTones.forEach(initialTone => {
+    finalTones.forEach(finalTone => {
+      const tonePair = `${initialTone},${finalTone}`;
+      stats[tonePair] = {
+        tries: 0,
+        successes: 0,
+        failures: 0,
+      };
+    });
+  });
+}
+
 let selectedWord; // The current word to guess
 
 // Function to randomly select a word
@@ -47,7 +64,7 @@ function renderToneOptions() {
 
   initialTones.forEach(initialTone => {
     const row = document.createElement('tr');
-   
+    
     finalTones.forEach(finalTone => {
       const tonePair = `${initialTone},${finalTone}`;
       const cell = document.createElement('td');
@@ -64,20 +81,42 @@ function renderToneOptions() {
 // Function to check the user's answer
 function checkAnswer(selectedTone) {
   const resultMsg = document.getElementById('result-msg');
+  const correctTone = selectedWord.tones;
 
-  if (selectedTone === selectedWord.tones) {
+  // Update stats
+  stats[selectedTone].tries++;
+  
+  if (selectedTone === correctTone) {
+    stats[selectedTone].successes++;
     resultMsg.className = 'alert alert-success';
-    resultMsg.innerText = 'Correct! You guessed the right tone pair!';
+    resultMsg.innerHTML = `Correct! The word was <strong>${selectedWord.word}</strong> with tone pair ${correctTone}.`;
   } else {
+    stats[selectedTone].failures++;
     resultMsg.className = 'alert alert-danger';
-    resultMsg.innerText = 'Wrong! Try again.';
+    resultMsg.innerHTML = `Wrong! The correct tone pair was <strong>${correctTone}</strong>. The word was <strong>${selectedWord.word}</strong>.`;
   }
 
   resultMsg.classList.remove('d-none');
+  updateStatistics();
+}
+
+// Function to update statistics display
+function updateStatistics() {
+  const statsContainer = document.getElementById('stats');
+  statsContainer.innerHTML = ''; // Clear previous stats
+
+  Object.keys(stats).forEach(tonePair => {
+    const { tries, successes, failures } = stats[tonePair];
+    const percentage = tries > 0 ? ((successes / tries) * 100).toFixed(2) : 0;
+    const statRow = document.createElement('p');
+    statRow.innerHTML = `Tone Pair ${tonePair}: Tries = ${tries}, Successes = ${successes}, Failures = ${failures}, Success Rate = ${percentage}%`;
+    statsContainer.appendChild(statRow);
+  });
 }
 
 // Initialize the game
 function initGame() {
+  initializeStats(); // Initialize stats for all tone pairs
   selectRandomWord();
   renderToneOptions();
   const resultMsg = document.getElementById('result-msg');
