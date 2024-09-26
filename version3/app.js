@@ -53,7 +53,6 @@ function selectRandomWord() {
 
 // Function to play the audio
 function playAudio() {
-  selectRandomWord();  // Select a new random word every time the button is pressed
   const audio = new Audio(selectedWord.audio_url);
   audio.play();
 }
@@ -132,7 +131,11 @@ function initGame() {
 }
 
 // Set up event listeners
-document.getElementById('play-btn').addEventListener('click', playAudio);
+document.getElementById('replay-btn').addEventListener('click', playAudio);
+document.getElementById('next-word-btn').addEventListener('click', function() {
+  selectRandomWord();
+  playAudio();
+});
 
 // Initialize game on page load
 initGame();
