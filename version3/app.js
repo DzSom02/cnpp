@@ -27,7 +27,7 @@ const wordSet = [
 const initialTones = ["1", "2", "3", "4"];
 const finalTones = ["1", "2", "3", "4", "neutral"];
 
-// Track statistics
+// Stats data structure to store tries and successes
 let stats = {};
 
 // Initialize the stats object for each tone pair
@@ -37,11 +37,19 @@ function initializeStats() {
       const tonePair = `${initialTone},${finalTone}`;
       stats[tonePair] = {
         tries: 0,
-        successes: 0,
-        failures: 0,
+        success: 0,  // Use "success" to match the rest of the code
+        failures: 0
       };
     });
   });
+}
+
+
+// Helper function to calculate the gradient color based on percentage
+function calculateGradientColor(percentage) {
+  // Set the range for HSL from red (0%) to green (100%)
+  const hue = (120 * percentage) / 100; // 0 is red, 120 is green in HSL
+  return `hsl(${hue}, 70%, 80%)`; // Light color with 70% saturation and 80% lightness
 }
 
 let selectedWord; // The current word to guess
@@ -84,15 +92,14 @@ function renderToneOptions() {
   });
 }
 
-// Function to check the user's answer
 function checkAnswer(selectedTone) {
   const resultMsg = document.getElementById('result-msg');
-  const correctTone = selectedWord.tones;
-
-  // Update stats
-  stats[selectedTone].tries++;
   
+  // Update stats
+  const data = stats[selectedWord.tones];
+  data.tries += 1;
   if (selectedTone === selectedWord.tones) {
+    data.success += 1;  // Increment the success count
     resultMsg.className = 'alert alert-success';
     resultMsg.innerText = 'Correct! You guessed the right tone pair!';
   } else {
@@ -101,29 +108,49 @@ function checkAnswer(selectedTone) {
   }
 
   resultMsg.classList.remove('d-none');
-  updateStatistics();
+
+  // Re-render stats table after each guess
+  renderStatsTable();
 }
 
-// Function to update statistics display in table form
-function updateStatistics() {
-  const statsTable = document.getElementById('stats-table-body');
-  statsTable.innerHTML = ''; // Clear previous stats
+// Function to render the stats table with gradient background
+// Function to render the stats table with gradient background
+function renderStatsTable() {
+  const tableBody = document.getElementById('stats-table');
+  tableBody.innerHTML = ''; // Clear previous table
 
-  Object.keys(stats).forEach(tonePair => {
-    const { tries, successes, failures } = stats[tonePair];
-    const percentage = tries > 0 ? ((successes / tries) * 100).toFixed(2) : 0;
-    
+  console.log("Rendering stats table..."); // Debug log
+
+  initialTones.forEach(initialTone => {
+    console.log(`Processing initial tone: ${initialTone}`); // Debug log for initial tone
+
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${tonePair}</td>
-      <td>${tries}</td>
-      <td>${successes}</td>
-      <td>${failures}</td>
-      <td>${percentage}%</td>
-    `;
-    
-    statsTable.appendChild(row);
+    const header = document.createElement('th');
+    header.innerText = initialTone;
+    row.appendChild(header); // Add row header
+
+    finalTones.forEach(finalTone => {
+      const tonePair = `${initialTone},${finalTone}`;
+      console.log(`Processing tone pair: ${tonePair}`); // Debug log for tone pair
+
+      const cell = document.createElement('td');
+      const data = stats[tonePair];
+
+      // Check if there are any tries, and calculate the success percentage
+      const percentage = data.tries > 0 ? Math.round((data.success / data.tries) * 100) : 0;
+      console.log(`Tone Pair: ${tonePair}, Tries: ${data.tries}, Successes: ${data.success}, Percentage: ${percentage}%`); // Debug log for stats
+
+      // Set the background color based on the percentage
+      cell.style.backgroundColor = calculateGradientColor(percentage);
+      cell.innerText = `${percentage}%`;
+
+      row.appendChild(cell);
+    });
+
+    tableBody.appendChild(row);
   });
+
+  console.log("Stats table rendering completed."); // Debug log when done
 }
 
 // Initialize the game
