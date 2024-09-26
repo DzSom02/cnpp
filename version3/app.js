@@ -30,6 +30,22 @@ const finalTones = ["1", "2", "3", "4", "neutral"];
 // Stats data structure to store tries and successes
 let stats = {};
 
+function saveStatsToLocalStorage() {
+  localStorage.setItem('tonePairStats', JSON.stringify(stats));
+  console.log('Stats saved to localStorage:', stats);  // Debugging log
+}
+
+function loadStatsFromLocalStorage() {
+  const storedStats = localStorage.getItem('tonePairStats');
+  if (storedStats) {
+    stats = JSON.parse(storedStats);
+    console.log('Stats loaded from localStorage:', stats);  // Debugging log
+  } else {
+    initializeStats(); // If no stats are stored, initialize a new stats object
+    console.log('No stats found in localStorage. Initializing new stats.');
+  }
+}
+
 // Initialize the stats object for each tone pair
 function initializeStats() {
   initialTones.forEach(initialTone => {
@@ -96,10 +112,10 @@ function checkAnswer(selectedTone) {
   const resultMsg = document.getElementById('result-msg');
   
   // Update stats
-  const data = stats[selectedWord.tones];
+  const data = stats[selectedTone];
   data.tries += 1;
   if (selectedTone === selectedWord.tones) {
-    data.success += 1;  // Increment the success count
+    data.success += 1;
     resultMsg.className = 'alert alert-success';
     resultMsg.innerText = 'Correct! You guessed the right tone pair!';
   } else {
@@ -108,6 +124,9 @@ function checkAnswer(selectedTone) {
   }
 
   resultMsg.classList.remove('d-none');
+
+  // Save stats to localStorage
+  saveStatsToLocalStorage();
 
   // Re-render stats table after each guess
   renderStatsTable();
@@ -155,10 +174,11 @@ function renderStatsTable() {
 
 // Initialize the game
 function initGame() {
-  initializeStats(); // Initialize stats for all tone pairs
+  loadStatsFromLocalStorage(); // Load stats from localStorage or initialize if not found
   renderToneOptions();
   const resultMsg = document.getElementById('result-msg');
   resultMsg.classList.add('d-none'); // Hide result message
+  renderStatsTable(); // Make sure to render the stats table on load
 }
 
 // Set up event listeners
