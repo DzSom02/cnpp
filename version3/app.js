@@ -110,7 +110,6 @@ const wordSet = [
 
   // 3,4 Tones
   { "tones": "3,4", "word": "米饭", "pinyin": "mǐfàn", "pinyin_no_tones": "mi fan", "hsk": "1" },
-  { "tones": "3,4", "word": "怎么样", "pinyin": "zěnmeyàng", "pinyin_no_tones": "zen me yang", "hsk": "1" },
   { "tones": "3,4", "word": "考试", "pinyin": "kǎoshì", "pinyin_no_tones": "kao shi", "hsk": "2" },
   { "tones": "3,4", "word": "跑步", "pinyin": "pǎobù", "pinyin_no_tones": "pao bu", "hsk": "2" },
   { "tones": "3,4", "word": "准备", "pinyin": "zhǔnbèi", "pinyin_no_tones": "zhun bei", "hsk": "2" },
@@ -142,7 +141,6 @@ const wordSet = [
   // 4,3 Tones
   { "tones": "4,3", "word": "电脑", "pinyin": "diànnǎo", "pinyin_no_tones": "dian nao", "hsk": "1" },
   { "tones": "4,3", "word": "电影", "pinyin": "diànyǐng", "pinyin_no_tones": "dian ying", "hsk": "1" },
-  { "tones": "4,3", "word": "对不起", "pinyin": "duìbuqǐ", "pinyin_no_tones": "dui bu qi", "hsk": "1" },
   { "tones": "4,3", "word": "汉语", "pinyin": "hànyǔ", "pinyin_no_tones": "han yu", "hsk": "1" },
   { "tones": "4,3", "word": "上午", "pinyin": "shàngwǔ", "pinyin_no_tones": "shang wu", "hsk": "1" },
   { "tones": "4,3", "word": "下午", "pinyin": "xiàwǔ", "pinyin_no_tones": "xia wu", "hsk": "1" },
