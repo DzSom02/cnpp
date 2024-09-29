@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chinese Tone Practice</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    .tone-btn {
+      margin: 5px;
+    }
+    .alert {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1 class="text-center mt-4">Chinese Tone Practice</h1>
+  
+  <!-- Tone selection form -->
+  <div class="row">
+    <div class="col-12 text-center mt-4">
+      <h3>Choose Tones to Practice</h3>
+      <div class="form-group">
+        <label for="tone1">Tone 1:</label>
+        <select id="tone1" class="form-control d-inline w-25">
+          <option value="1">Tone 1</option>
+          <option value="2">Tone 2</option>
+          <option value="3">Tone 3</option>
+          <option value="4">Tone 4</option>
+        </select>
+        
+        <label for="tone2">Tone 2:</label>
+        <select id="tone2" class="form-control d-inline w-25">
+          <option value="1">Tone 1</option>
+          <option value="2">Tone 2</option>
+          <option value="3">Tone 3</option>
+          <option value="4">Tone 4</option>
+        </select>
+      </div>
+      
+      <button id="start-btn" class="btn btn-primary mt-2">Start Practice</button>
+      <button id="practice-all-btn" class="btn btn-secondary mt-2">Practice All Tones</button>
+    </div>
+  </div>
+
+  <!-- Result message -->
+  <div id="result-msg" class="alert d-none" role="alert"></div>
+
+  <!-- Tone choice buttons (will be dynamically shown based on practiced tones) -->
+  <div class="row mt-4 text-center">
+    <div class="col-12">
+      <h3>Choose the Correct Tone</h3>
+      <div id="tone-buttons" class="d-none"></div>
+    </div>
+  </div>
+  <div class="container mt-4">
+    <div id="stats" class="mt-4"></div>
+  </div>
+
+
+</div>
+
+<script>
+  const sounds = ['ba', 'ma', 'la', 'da', 'pa']; // Example sound set
+  let practiceTones = [];  // Store selected tones for practice
+  let correctTone = null;  // Store the correct tone for each sound
+  let currentSound = null; // Store the current sound for practice
+  let practiceAllTones = false;
+
+  // Stats structure to store tries and successes for tone pairs and individual tones
+  let stats = {
+    tonePairs: {},  // For tracking 1vs2, 1vs3, etc.
+    individualTones: {
+      1: { correct: 0, wrong: 0 },
+      2: { correct: 0, wrong: 0 },
+      3: { correct: 0, wrong: 0 },
+      4: { correct: 0, wrong: 0 }
+    }
+  };
+  // Before starting practice, initialize the stats for the selected tone pair
+  document.getElementById('start-btn').addEventListener('click', function() {
+    const tone1 = parseInt(document.getElementById('tone1').value);
+    const tone2 = parseInt(document.getElementById('tone2').value);
+    const pairKey = `${tone1}vs${tone2}`;
+  
+    if (tone1 !== tone2) {
+      practiceTones = [tone1, tone2];
+      practiceAllTones = false;
+  
+      // Initialize the tone pair stats if not already
+      if (!stats.tonePairs[pairKey]) {
+        stats.tonePairs[pairKey] = { tries: 0, correct: 0 };
+      }
+  
+      renderToneButtons();
+      selectRandomTone();
+    } else {
+      alert('Please select two different tones.');
+    }
+  });
+
+
+
+  // Load stats from localStorage
+  function loadStats() {
+    const storedStats = localStorage.getItem('tonePracticeStats');
+    if (storedStats) {
+      stats = JSON.parse(storedStats);
+    }
+  }
+
+  // Save stats to localStorage
+  function saveStats() {
+    localStorage.setItem('tonePracticeStats', JSON.stringify(stats));
+  }
+
+  // Select a random sound and tone from the practiceTones set
+  function selectRandomTone() {
+    const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+    currentSound = randomSound;
+
+    if (practiceAllTones) {
+      correctTone = Math.floor(Math.random() * 4) + 1;
+    } else {
+      correctTone = practiceTones[Math.floor(Math.random() * practiceTones.length)];
+    }
+
+    playAudio();
+  }
+
+  // Play the selected sound with the correct tone
+  function playAudio() {
+    const audioPath = `../version2/audios/${currentSound}${correctTone}.mp3`;
+    const audio = new Audio(audioPath);
+    audio.play();
+  }
+
+  // Handle when a tone button is clicked
+  function handleToneClick(tone) {
+    const resultMsg = document.getElementById('result-msg');
+  
+    const pairKey = practiceAllTones ? '1vs2vs3vs4' : `${practiceTones[0]}vs${practiceTones[1]}`;
+    stats.tonePairs[pairKey].tries++;
+  
+    if (tone === correctTone) {
+      stats.tonePairs[pairKey].correct++;
+      stats.individualTones[tone].correct++;
+  
+      resultMsg.className = 'alert alert-success';
+      resultMsg.innerText = 'Correct! You guessed the right tone!';
+    } else {
+      stats.individualTones[tone].wrong++;
+  
+      resultMsg.className = 'alert alert-danger';
+      resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
+    }
+  
+    resultMsg.classList.remove('d-none');
+    saveStats(); // Save the updated stats to localStorage
+    renderStats(); // Render the updated stats after each guess
+  
+  setTimeout(() => {
+    resultMsg.classList.add('d-none'); // Hide result message
+    selectRandomTone(); // Automatically move to the next sound
+  }, 2000);
+
+  }
+
+
+  // Start practice with two selected tones
+  document.getElementById('start-btn').addEventListener('click', function() {
+    const tone1 = parseInt(document.getElementById('tone1').value);
+    const tone2 = parseInt(document.getElementById('tone2').value);
+
+    if (tone1 !== tone2) {
+      practiceTones = [tone1, tone2];
+      practiceAllTones = false;
+      renderToneButtons();  // Render only the selected tone buttons
+      selectRandomTone();  // Start practicing
+    } else {
+      alert('Please select two different tones.');
+    }
+  });
+
+  // Start practice with all tones
+  document.getElementById('practice-all-btn').addEventListener('click', function() {
+    practiceTones = [1, 2, 3, 4];
+    practiceAllTones = true;
+    renderToneButtons();  // Render all tone buttons
+    selectRandomTone();   // Start practicing
+  });
+
+  // Render tone buttons based on the selected practice tones
+  function renderToneButtons() {
+    const toneButtonsDiv = document.getElementById('tone-buttons');
+    toneButtonsDiv.innerHTML = ''; // Clear any existing buttons
+
+    let tonesToRender = practiceAllTones ? [1, 2, 3, 4] : practiceTones;
+
+    tonesToRender.forEach(tone => {
+      const toneBtn = document.createElement('button');
+      toneBtn.className = 'btn btn-info tone-btn';
+      toneBtn.innerText = `Tone ${tone}`;
+      toneBtn.addEventListener('click', () => handleToneClick(tone));
+      toneButtonsDiv.appendChild(toneBtn);
+    });
+
+    toneButtonsDiv.classList.remove('d-none'); // Show tone buttons
+  }
+
+  function renderStats() {
+    const statsDiv = document.getElementById('stats');
+    statsDiv.innerHTML = '<h3>Stats:</h3>';
+  
+    // Create table for tone pair stats
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-bordered', 'text-center');
+  
+    // Create table header row with tone numbers
+    const headerRow = document.createElement('tr');
+    const emptyHeaderCell = document.createElement('th');  // Empty corner cell
+    headerRow.appendChild(emptyHeaderCell);
+  
+    [1, 2, 3, 4].forEach(tone => {
+      const headerCell = document.createElement('th');
+      headerCell.innerText = `Tone ${tone}`;
+      headerRow.appendChild(headerCell);
+    });
+  
+    table.appendChild(headerRow);
+  
+    // Create table rows
+    [1, 2, 3, 4].forEach(initialTone => {
+      const row = document.createElement('tr');
+      const rowHeader = document.createElement('th'); // Row header for tone number
+      rowHeader.innerText = `Tone ${initialTone}`;
+      row.appendChild(rowHeader);
+  
+      [1, 2, 3, 4].forEach(finalTone => {
+        const cell = document.createElement('td');
+  
+        if (initialTone === finalTone) {
+          // Disable cells where tones are the same (1vs1, 2vs2, etc.)
+          cell.style.backgroundColor = '#e9ecef';  // Bootstrap disabled background
+          cell.innerText = 'N/A';
+        } else {
+          const pairKey = `${initialTone}vs${finalTone}`;
+          const pairStats = stats.tonePairs[pairKey];
+  
+          if (pairStats) {
+            const percentage = pairStats.tries > 0 ? Math.round((pairStats.correct / pairStats.tries) * 100) : 0;
+  
+            // Set background color based on the percentage of success
+            cell.style.backgroundColor = calculateBackgroundColor(percentage);
+  
+            cell.innerText = `${percentage}% (${pairStats.correct}/${pairStats.tries})`;
+          } else {
+            cell.innerText = '0% (0/0)';
+            cell.style.backgroundColor = calculateBackgroundColor(0);
+          }
+        }
+  
+        row.appendChild(cell);
+      });
+  
+      table.appendChild(row);
+    });
+  
+    // Append the table to the stats div
+    statsDiv.innerHTML = '';  // Clear previous content
+    statsDiv.appendChild(table);
+  }
+
+  function calculateBackgroundColor(percentage) {
+    // Hue ranges from red (0°) to green (120°) in HSL, start green at 80%
+    let hue;
+    
+    if (percentage >= 80) {
+      hue = 120;  // Full green
+    } else {
+      hue = (percentage / 80) * 120;  // Linear scale for red to green up to 80%
+    }
+  
+    return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
+  }
+
+  // Initialize
+  //loadStats();  // Load stored stats on page load
+</script>
+
+</body>
+</html>
+
