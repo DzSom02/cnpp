@@ -129,8 +129,6 @@
     } else {
       correctTone = practiceTones[Math.floor(Math.random() * practiceTones.length)];
     }
-
-    // playAudio();
   }
 
   // Play the selected sound with the correct tone
@@ -166,7 +164,6 @@
       resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
     }
   
-    //resultMsg.classList.remove('d-none');
     saveStats(); // Save the updated stats to localStorage
     renderStats(); // Render the updated stats after each guess
     selectRandomTone(); // Automatically move to the next sound
@@ -184,17 +181,30 @@
   function renderToneButtons() {
     const toneButtonsDiv = document.getElementById('tone-buttons');
     toneButtonsDiv.innerHTML = ''; // Clear any existing buttons
-
+  
     let tonesToRender = practiceAllTones ? [1, 2, 3, 4] : practiceTones;
-
+  
     tonesToRender.forEach(tone => {
       const toneBtn = document.createElement('button');
       toneBtn.className = 'btn btn-info tone-btn';
-      toneBtn.innerText = `Tone ${tone}`;
+      toneBtn.style.width = '60px'; // Set the button width to 60px
+      toneBtn.style.textAlign = 'center'; // Center the text
+  
+      // Map tone numbers to their respective marks
+      const toneMarks = {
+        1: '¯', // First tone (high level)
+        2: '́',  // Second tone (rising)
+        3: '̌',  // Third tone (dipping)
+        4: '̀'   // Fourth tone (falling)
+      };
+  
+      // Set button inner HTML with reduced space
+      toneBtn.innerHTML = `${toneMarks[tone]}<br style="line-height: 0;">${tone}`;
+      
       toneBtn.addEventListener('click', () => handleToneClick(tone));
       toneButtonsDiv.appendChild(toneBtn);
     });
-
+  
     toneButtonsDiv.classList.remove('d-none'); // Show tone buttons
   }
 
@@ -274,8 +284,6 @@
     return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
   }
 
-  // Initialize
-  //loadStats();  // Load stored stats on page load
 </script>
 
 </body>
