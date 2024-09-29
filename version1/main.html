@@ -188,10 +188,15 @@
     const resultMsg = document.getElementById('result-msg');
     
     const pairKey = getSortedPairKey(practiceTones[0], practiceTones[1]); // Normalize key
-    stats.tonePairs[pairKey].tries++;
+
+    if (!practiceAllTones) {
+      stats.tonePairs[pairKey].tries++;
+    }
   
     if (tone === correctTone) {
-      stats.tonePairs[pairKey].correct++;
+      if (!practiceAllTones) {
+        stats.tonePairs[pairKey].correct++;
+      }
       stats.individualTones[tone].correct++;
   
       resultMsg.className = 'alert alert-success';
