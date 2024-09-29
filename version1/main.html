@@ -41,13 +41,13 @@
         </select>
       </div>
       
-      <button id="start-btn" class="btn btn-primary mt-2">Start Practice</button>
+      <button id="play-btn" class="btn btn-primary mt-2">Play</button>
       <button id="practice-all-btn" class="btn btn-secondary mt-2">Practice All Tones</button>
     </div>
   </div>
 
   <!-- Result message -->
-  <div id="result-msg" class="alert d-none" role="alert"></div>
+  <div id="result-msg" class="alert" role="alert"></div>
 
   <!-- Tone choice buttons (will be dynamically shown based on practiced tones) -->
   <div class="row mt-4 text-center">
@@ -80,29 +80,31 @@
       4: { correct: 0, wrong: 0 }
     }
   };
-  // Before starting practice, initialize the stats for the selected tone pair
-  document.getElementById('start-btn').addEventListener('click', function() {
+  // Function to handle changes in tone selection
+  function handleToneSelectionChange() {
     const tone1 = parseInt(document.getElementById('tone1').value);
     const tone2 = parseInt(document.getElementById('tone2').value);
     const pairKey = `${tone1}vs${tone2}`;
-  
+
     if (tone1 !== tone2) {
       practiceTones = [tone1, tone2];
       practiceAllTones = false;
-  
+
       // Initialize the tone pair stats if not already
       if (!stats.tonePairs[pairKey]) {
         stats.tonePairs[pairKey] = { tries: 0, correct: 0 };
       }
-  
-      renderToneButtons();
-      selectRandomTone();
+
+      renderToneButtons();  // Render tone buttons for the selected tones
+      selectRandomTone();    // Start practicing with the first sound
     } else {
       alert('Please select two different tones.');
     }
-  });
+  }
 
-
+  // Add event listeners to the tone dropdowns to trigger practice setup when the value changes
+  document.getElementById('tone1').addEventListener('change', handleToneSelectionChange);
+  document.getElementById('tone2').addEventListener('change', handleToneSelectionChange);
 
   // Load stats from localStorage
   function loadStats() {
@@ -128,15 +130,21 @@
       correctTone = practiceTones[Math.floor(Math.random() * practiceTones.length)];
     }
 
-    playAudio();
+    // playAudio();
   }
 
   // Play the selected sound with the correct tone
   function playAudio() {
     const audioPath = `../version2/audios/${currentSound}${correctTone}.mp3`;
     const audio = new Audio(audioPath);
+    const resultMsg = document.getElementById('result-msg');
+
+    resultMsg.className = 'alert alert-secondary';
+    resultMsg.innerText = "Listen Carefully!";
     audio.play();
   }
+
+  document.getElementById('play-btn').addEventListener('click', playAudio);
 
   // Handle when a tone button is clicked
   function handleToneClick(tone) {
@@ -158,32 +166,11 @@
       resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
     }
   
-    resultMsg.classList.remove('d-none');
+    //resultMsg.classList.remove('d-none');
     saveStats(); // Save the updated stats to localStorage
     renderStats(); // Render the updated stats after each guess
-  
-  setTimeout(() => {
-    resultMsg.classList.add('d-none'); // Hide result message
     selectRandomTone(); // Automatically move to the next sound
-  }, 2000);
-
   }
-
-
-  // Start practice with two selected tones
-  document.getElementById('start-btn').addEventListener('click', function() {
-    const tone1 = parseInt(document.getElementById('tone1').value);
-    const tone2 = parseInt(document.getElementById('tone2').value);
-
-    if (tone1 !== tone2) {
-      practiceTones = [tone1, tone2];
-      practiceAllTones = false;
-      renderToneButtons();  // Render only the selected tone buttons
-      selectRandomTone();  // Start practicing
-    } else {
-      alert('Please select two different tones.');
-    }
-  });
 
   // Start practice with all tones
   document.getElementById('practice-all-btn').addEventListener('click', function() {
