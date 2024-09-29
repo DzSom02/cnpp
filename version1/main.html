@@ -55,6 +55,7 @@
   </div>
   <div class="container mt-4">
     <div id="stats" class="mt-4"></div>
+    <div id="individual-stats"></div>
   </div>
 </div>
 
@@ -197,12 +198,12 @@
       if (!practiceAllTones) {
         stats.tonePairs[pairKey].correct++;
       }
-      stats.individualTones[tone].correct++;
+      stats.individualTones[correctTone].correct++;
   
       resultMsg.className = 'alert alert-success';
       resultMsg.innerText = 'Correct! You guessed the right tone!';
     } else {
-      stats.individualTones[tone].wrong++;
+      stats.individualTones[correctTone].wrong++;
   
       resultMsg.className = 'alert alert-danger';
       resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
@@ -305,7 +306,59 @@
     // Append the table to the stats div
     statsDiv.innerHTML = '';  // Clear previous content
     statsDiv.appendChild(table);
+    renderIndividualToneStats();
   }
+
+  function renderIndividualToneStats() {
+    const statsDiv = document.getElementById('individual-stats');
+    statsDiv.innerHTML = '<h3>Individual Tone Stats:</h3>';
+    
+    // Create table for individual tone stats
+    const table = document.createElement('table');
+    table.classList.add('table', 'table-bordered', 'text-center');
+  
+    // Create table header row
+    const headerRow = document.createElement('tr');
+    const headerCellTone = document.createElement('th');
+    headerCellTone.innerText = 'Tone';
+    headerRow.appendChild(headerCellTone);
+  
+    const headerCellPercentage = document.createElement('th');
+    headerCellPercentage.innerText = 'Success Rate';
+    headerRow.appendChild(headerCellPercentage);
+  
+    table.appendChild(headerRow);
+  
+    // Create rows for each individual tone
+    [1, 2, 3, 4].forEach(tone => {
+      const row = document.createElement('tr');
+  
+      // Tone number column
+      const toneCell = document.createElement('td');
+      toneCell.innerText = `Tone ${tone}`;
+      row.appendChild(toneCell);
+  
+      // Calculate success rate
+      const correct = stats.individualTones[tone].correct;
+      const tries = correct + stats.individualTones[tone].wrong;
+      const percentage = tries > 0 ? Math.round((correct / tries) * 100) : 0;
+  
+      // Success rate cell with background color
+      const percentageCell = document.createElement('td');
+      percentageCell.innerText = `${percentage}% (${correct}/${tries})`;
+      percentageCell.style.backgroundColor = calculateBackgroundColor(percentage);
+  
+      row.appendChild(percentageCell);
+  
+      table.appendChild(row);
+    });
+  
+    // Append the table to the individual stats div
+    statsDiv.innerHTML = '';  // Clear previous content
+    statsDiv.appendChild(table);
+  }
+
+
   function calculateBackgroundColor(percentage) {
     // Hue ranges from red (0°) to green (120°) in HSL, start green at 80%
     let hue;
