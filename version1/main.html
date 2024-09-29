@@ -23,26 +23,18 @@
   <div class="row">
     <div class="col-12 text-center mt-4">
       <h3>Choose Tones to Practice</h3>
-      <div class="form-group">
-        <label for="tone1">Tone 1:</label>
-        <select id="tone1" class="form-control d-inline w-25">
-          <option value="1">Tone 1</option>
-          <option value="2">Tone 2</option>
-          <option value="3">Tone 3</option>
-          <option value="4">Tone 4</option>
-        </select>
-        
-        <label for="tone2">Tone 2:</label>
-        <select id="tone2" class="form-control d-inline w-25">
-          <option value="1">Tone 1</option>
-          <option value="2">Tone 2</option>
-          <option value="3">Tone 3</option>
-          <option value="4">Tone 4</option>
-        </select>
+      <div class="btn-group" role="group" aria-label="Tone selection">
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="2">1,2</button>
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="3">1,3</button>
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="4">1,4</button>
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="3">2,3</button>
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="4">2,4</button>
+        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="3" data-tone2="4">3,4</button>
       </div>
-      
-      <button id="play-btn" class="btn btn-primary mt-2">Play</button>
-      <button id="practice-all-btn" class="btn btn-secondary mt-2">Practice All Tones</button>
+      <div>
+        <button id="play-btn" class="btn btn-primary mt-2">Play</button>
+        <button id="practice-all-btn" class="btn btn-secondary mt-2">Practice All Tones</button>
+      </div>
     </div>
   </div>
 
@@ -117,10 +109,21 @@
 
   loadStats(); // Load stats on page load
 
-  // Function to handle changes in tone selection
-  function handleToneSelectionChange() {
-    const tone1 = parseInt(document.getElementById('tone1').value);
-    const tone2 = parseInt(document.getElementById('tone2').value);
+  // Function to handle tone selection via button clicks
+  function handleToneSelectionChange(event) {
+
+    // Remove 'active' class from all buttons
+    document.querySelectorAll('.tone-btn-sel').forEach(button => {
+      button.classList.remove('active');
+    });
+  
+    // Add 'active' class to the clicked button
+    event.target.classList.add('active');
+  
+    // Extract tone values from the clicked button's data attributes
+    const tone1 = parseInt(event.target.getAttribute('data-tone1'));
+    const tone2 = parseInt(event.target.getAttribute('data-tone2'));
+    
     const pairKey = getSortedPairKey(tone1, tone2); // Normalize key
   
     if (tone1 !== tone2) {
@@ -138,15 +141,17 @@
       alert('Please select two different tones.');
     }
   }
+
+
   // Helper function to get a normalized key for the tone pairs
   function getSortedPairKey(tone1, tone2) {
     return tone1 < tone2 ? `${tone1}vs${tone2}` : `${tone2}vs${tone1}`;
   }
 
-
-  // Add event listeners to the tone dropdowns to trigger practice setup when the value changes
-  document.getElementById('tone1').addEventListener('change', handleToneSelectionChange);
-  document.getElementById('tone2').addEventListener('change', handleToneSelectionChange);
+  // Attach event listener to each tone button
+  document.querySelectorAll('.tone-btn-sel').forEach(button => {
+    button.addEventListener('click', handleToneSelectionChange);
+  });
 
   // Select a random sound and tone from the practiceTones set
   function selectRandomTone() {
