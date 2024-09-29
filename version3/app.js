@@ -179,7 +179,6 @@ const wordSet = [
   { "tones": "4,neutral", "word": "丈夫", "pinyin": "zhàngfu", "pinyin_no_tones": "zhang fu", "hsk": "2" },
 ];
 
-
 // Possible tone pairs for rendering the table
 const initialTones = ["1", "2", "3", "4"];
 const finalTones = ["1", "2", "3", "4", "neutral"];
@@ -187,19 +186,19 @@ const finalTones = ["1", "2", "3", "4", "neutral"];
 // Stats data structure to store tries and successes
 let stats = {};
 
+let selectedWord; // The current word to guess
+let isAnswerSelected = false; // Track if an answer has been selected
+
 function saveStatsToLocalStorage() {
   localStorage.setItem('tonePairStats', JSON.stringify(stats));
-  console.log('Stats saved to localStorage:', stats);  // Debugging log
 }
 
 function loadStatsFromLocalStorage() {
   const storedStats = localStorage.getItem('tonePairStats');
   if (storedStats) {
     stats = JSON.parse(storedStats);
-    console.log('Stats loaded from localStorage:', stats);  // Debugging log
   } else {
     initializeStats(); // If no stats are stored, initialize a new stats object
-    console.log('No stats found in localStorage. Initializing new stats.');
   }
 }
 
@@ -210,22 +209,17 @@ function initializeStats() {
       const tonePair = `${initialTone},${finalTone}`;
       stats[tonePair] = {
         tries: 0,
-        success: 0,  // Use "success" to match the rest of the code
+        success: 0,
         failures: 0
       };
     });
   });
 }
 
-
-// Helper function to calculate the gradient color based on percentage
 function calculateGradientColor(percentage) {
-  // Set the range for HSL from red (0%) to green (100%)
   const hue = (120 * percentage) / 100; // 0 is red, 120 is green in HSL
   return `hsl(${hue}, 70%, 80%)`; // Light color with 70% saturation and 80% lightness
 }
-
-let selectedWord; // The current word to guess
 
 // Function to randomly select a word
 function selectRandomWord() {
@@ -235,11 +229,22 @@ function selectRandomWord() {
   // Display the selected word and pinyin (without tones)
   document.getElementById('selected-word').innerText = `Word: ${selectedWord.word}`;
   document.getElementById('selected-pinyin').innerText = `Pinyin: ${selectedWord.pinyin_no_tones}`;
+  
+  // Enable tone selection buttons and disable the "Next Word" button
+  enableToneSelection();
+  document.getElementById('next-word-btn').disabled = true;
+
+  // Clear the result message
+  const resultMsg = document.getElementById('result-msg');
+  resultMsg.classList.add('d-none');
+  resultMsg.innerText = '';
+
+  // Reset answer tracking
+  isAnswerSelected = false;
 }
 
-// Function to play the audio by generating the path dynamically
 function playAudio() {
-  const audioPath = `tone_pairs/${selectedWord.word}.mp3`; // Generate the path
+  const audioPath = `tone_pairs/${selectedWord.word}.mp3`;
   const audio = new Audio(audioPath);
   audio.play();
 }
@@ -266,6 +271,8 @@ function renderToneOptions() {
 }
 
 function checkAnswer(selectedTone) {
+  if (isAnswerSelected) return; // Prevent further answers
+
   const resultMsg = document.getElementById('result-msg');
   
   // Update stats
@@ -281,6 +288,11 @@ function checkAnswer(selectedTone) {
   }
 
   resultMsg.classList.remove('d-none');
+  
+  // Disable further answers and enable "Next Word" button
+  isAnswerSelected = true;
+  disableToneSelection();
+  document.getElementById('next-word-btn').disabled = false;
 
   // Save stats to localStorage
   saveStatsToLocalStorage();
@@ -289,17 +301,27 @@ function checkAnswer(selectedTone) {
   renderStatsTable();
 }
 
-// Function to render the stats table with gradient background
+function disableToneSelection() {
+  const cells = document.querySelectorAll('.table-cell');
+  cells.forEach(cell => {
+    cell.onclick = null; // Disable clicking
+  });
+}
+
+function enableToneSelection() {
+  const cells = document.querySelectorAll('.table-cell');
+  cells.forEach(cell => {
+    const tonePair = cell.innerText;
+    cell.onclick = () => checkAnswer(tonePair); // Re-enable clicking
+  });
+}
+
 // Function to render the stats table with gradient background
 function renderStatsTable() {
   const tableBody = document.getElementById('stats-table');
   tableBody.innerHTML = ''; // Clear previous table
 
-  console.log("Rendering stats table..."); // Debug log
-
   initialTones.forEach(initialTone => {
-    console.log(`Processing initial tone: ${initialTone}`); // Debug log for initial tone
-
     const row = document.createElement('tr');
     const header = document.createElement('th');
     header.innerText = initialTone;
@@ -307,16 +329,11 @@ function renderStatsTable() {
 
     finalTones.forEach(finalTone => {
       const tonePair = `${initialTone},${finalTone}`;
-      console.log(`Processing tone pair: ${tonePair}`); // Debug log for tone pair
-
       const cell = document.createElement('td');
       const data = stats[tonePair];
 
       // Check if there are any tries, and calculate the success percentage
       const percentage = data.tries > 0 ? Math.round((data.success / data.tries) * 100) : 0;
-      console.log(`Tone Pair: ${tonePair}, Tries: ${data.tries}, Successes: ${data.success}, Percentage: ${percentage}%`); // Debug log for stats
-
-      // Set the background color based on the percentage
       cell.style.backgroundColor = calculateGradientColor(percentage);
       cell.innerText = `${percentage}%`;
 
@@ -325,8 +342,6 @@ function renderStatsTable() {
 
     tableBody.appendChild(row);
   });
-
-  console.log("Stats table rendering completed."); // Debug log when done
 }
 
 // Initialize the game
