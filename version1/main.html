@@ -59,8 +59,6 @@
   <div class="container mt-4">
     <div id="stats" class="mt-4"></div>
   </div>
-
-
 </div>
 
 <script>
@@ -80,6 +78,22 @@
       4: { correct: 0, wrong: 0 }
     }
   };
+
+  // Load stats from localStorage when the page loads
+  function loadStats() {
+    const storedStats = localStorage.getItem('tonePracticeStats');
+    if (storedStats) {
+      stats = JSON.parse(storedStats);
+    }
+  }
+
+  // Save stats to localStorage
+  function saveStats() {
+    localStorage.setItem('tonePracticeStats', JSON.stringify(stats));
+  }
+
+  loadStats(); // Load stats on page load
+
   // Function to handle changes in tone selection
   function handleToneSelectionChange() {
     const tone1 = parseInt(document.getElementById('tone1').value);
@@ -105,19 +119,6 @@
   // Add event listeners to the tone dropdowns to trigger practice setup when the value changes
   document.getElementById('tone1').addEventListener('change', handleToneSelectionChange);
   document.getElementById('tone2').addEventListener('change', handleToneSelectionChange);
-
-  // Load stats from localStorage
-  function loadStats() {
-    const storedStats = localStorage.getItem('tonePracticeStats');
-    if (storedStats) {
-      stats = JSON.parse(storedStats);
-    }
-  }
-
-  // Save stats to localStorage
-  function saveStats() {
-    localStorage.setItem('tonePracticeStats', JSON.stringify(stats));
-  }
 
   // Select a random sound and tone from the practiceTones set
   function selectRandomTone() {
@@ -283,7 +284,6 @@
   
     return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
   }
-
 </script>
 
 </body>
