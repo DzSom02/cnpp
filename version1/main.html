@@ -32,8 +32,13 @@
         <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="3" data-tone2="4">3,4</button>
       </div>
       <div>
+        <input type="checkbox" id="practice-all-checkbox" class="form-check-input">
+        <label for="practice-all-checkbox" class="form-check-label">Practice All Tones</label>
+      </div>
+      <hr/>
+      <div>
         <button id="play-btn" class="btn btn-primary mt-2">Play</button>
-        <button id="practice-all-btn" class="btn btn-secondary mt-2">Practice All Tones</button>
+
       </div>
     </div>
   </div>
@@ -202,13 +207,6 @@
     renderStats(); // Render the updated stats after each guess
     selectRandomTone(); // Automatically move to the next sound
   }
-  // Start practice with all tones
-  document.getElementById('practice-all-btn').addEventListener('click', function() {
-    practiceTones = [1, 2, 3, 4];
-    practiceAllTones = true;
-    renderToneButtons();  // Render all tone buttons
-    selectRandomTone();   // Start practicing
-  });
 
   // Render tone buttons based on the selected practice tones
   function renderToneButtons() {
@@ -315,6 +313,27 @@
   
     return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
   }
+  // Add event listener for the Practice All Tones checkbox
+  document.getElementById('practice-all-checkbox').addEventListener('change', function() {
+    const checkbox = document.getElementById('practice-all-checkbox');
+    const toneButtons = document.querySelectorAll('.tone-btn-sel');
+  
+    if (checkbox.checked) {
+      // Disable tone selection buttons and activate Practice All mode
+      toneButtons.forEach(button => button.disabled = true);
+      practiceTones = [1, 2, 3, 4];
+      practiceAllTones = true;
+      renderToneButtons();  // Render all tone buttons
+      selectRandomTone();   // Start practicing with all tones
+    } else {
+      // Enable tone selection buttons and deactivate Practice All mode
+      toneButtons.forEach(button => button.disabled = false);
+      practiceAllTones = false;
+      practiceTones = []; // Reset the practice tones
+      document.getElementById('tone-buttons').classList.add('d-none');  // Hide the tone buttons
+    }
+  });
+
 </script>
 
 </body>
