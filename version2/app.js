@@ -25,8 +25,10 @@ document.addEventListener('DOMContentLoaded', function () {
     ["zhu", "qu"],
     ["zhu", "chu"],
     ["zhe", "re"],
-    ["zai", "cai"]
-
+    ["zai", "cai"],
+    ["kou", "gou"],
+    ["qi", "zhi"],
+    ["zuo","cuo"]
     // Add more pairs as needed
   ];
 
