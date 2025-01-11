@@ -5,8 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const message = document.getElementById('message');
   const allStatsDiv = document.getElementById('allStats');
   const deleteStatsButton = document.getElementById('deleteStatsButton');
-
-  const sounds = ["zhong", "cong", "shi", "si", "zi", "zhi", "jian", "qian", "ji", "xi", "chi", "wan", "guan", "chu", "qu", "zhu", "zhe", "re", "zai", "cai", "kou", "gou", "qi", "zuo", "cuo"];
   const audioFolder = "./audios/";
   const numColumns = 10; // Number of columns in the table
   let currentPair = [];
@@ -16,20 +14,25 @@ document.addEventListener('DOMContentLoaded', function () {
   const statistics = loadStatistics();
 
   function populateSoundTable() {
-    let row;
-    sounds.forEach((sound, index) => {
-      if (index % numColumns === 0) {
-        row = document.createElement('tr');
-        soundTable.appendChild(row);
-      }
+    const soundTable = document.getElementById('soundTable'); // Ensure the table element has this ID
+    
+    // Select all td elements inside the table body, excluding th
+    const bodyRows = soundTable.querySelectorAll('tbody tr'); // Select rows in the table body
+    
+    bodyRows.forEach(row => {
+      const cells = row.querySelectorAll('td'); // Select all td elements in the row
 
-      const cell = document.createElement('td');
-      cell.textContent = sound;
-      cell.classList.add('sound-cell', 'p-2');
-      cell.addEventListener('click', function () {
-        toggleSelection(sound, cell);
+      cells.forEach(cell => {
+        const sound = cell.textContent.trim(); // Get the text content of the cell
+        
+        // Add click event only to non-empty cells
+        if (sound) {
+          cell.addEventListener('click', function () {
+            toggleSelection(sound, cell);
+          });
+          cell.classList.add("sound-cell")
+        }
       });
-      row.appendChild(cell);
     });
   }
 
@@ -160,3 +163,4 @@ document.addEventListener('DOMContentLoaded', function () {
   deleteStatsButton.addEventListener('click', deleteStatistics);
   populateSoundTable();
 });
+
