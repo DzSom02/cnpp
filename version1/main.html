@@ -15,384 +15,387 @@
   </style>
 </head>
 <body>
-
-<div class="container">
-  <h1 class="text-center mt-4">Chinese Tone Practice</h1>
+  <!-- Menu Section -->
+  <div id="menu"></div>
+  <div class="container">
+    <h1 class="text-center mt-4">Chinese Tone Practice</h1>
+    
+    <!-- Tone selection form -->
+    <div class="row">
+      <div class="col-12 text-center mt-4">
+        <h3>Choose Tones to Practice</h3>
+        <div class="btn-group" role="group" aria-label="Tone selection">
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="2">1,2</button>
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="3">1,3</button>
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="4">1,4</button>
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="3">2,3</button>
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="4">2,4</button>
+          <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="3" data-tone2="4">3,4</button>
+        </div>
+        <div>
+          <input type="checkbox" id="practice-all-checkbox" class="form-check-input">
+          <label for="practice-all-checkbox" class="form-check-label">Practice All Tones</label>
+        </div>
+        <hr/>
+        <div>
+          <button id="play-btn" class="btn btn-primary mt-2">Play</button>
   
-  <!-- Tone selection form -->
-  <div class="row">
-    <div class="col-12 text-center mt-4">
-      <h3>Choose Tones to Practice</h3>
-      <div class="btn-group" role="group" aria-label="Tone selection">
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="2">1,2</button>
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="3">1,3</button>
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="1" data-tone2="4">1,4</button>
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="3">2,3</button>
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="2" data-tone2="4">2,4</button>
-        <button type="button" class="btn btn-outline-secondary tone-btn-sel" data-tone1="3" data-tone2="4">3,4</button>
-      </div>
-      <div>
-        <input type="checkbox" id="practice-all-checkbox" class="form-check-input">
-        <label for="practice-all-checkbox" class="form-check-label">Practice All Tones</label>
-      </div>
-      <hr/>
-      <div>
-        <button id="play-btn" class="btn btn-primary mt-2">Play</button>
-
+        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Result message -->
-  <div id="result-msg" class="alert" role="alert"></div>
-
-  <!-- Tone choice buttons (will be dynamically shown based on practiced tones) -->
-  <div class="row mt-4 text-center">
-    <div class="col-12">
-      <h3>Choose the Correct Tone</h3>
-      <div id="tone-buttons" class="d-none"></div>
+  
+    <!-- Result message -->
+    <div id="result-msg" class="alert" role="alert"></div>
+  
+    <!-- Tone choice buttons (will be dynamically shown based on practiced tones) -->
+    <div class="row mt-4 text-center">
+      <div class="col-12">
+        <h3>Choose the Correct Tone</h3>
+        <div id="tone-buttons" class="d-none"></div>
+      </div>
+    </div>
+    <div class="container mt-4">
+      <div id="stats" class="mt-4"></div>
+      <div id="individual-stats"></div>
     </div>
   </div>
-  <div class="container mt-4">
-    <div id="stats" class="mt-4"></div>
-    <div id="individual-stats"></div>
-  </div>
-</div>
-
-<script>
-  const sounds = [
-    'a', 'ai', 'an', 'ang', 'ao', 'ba', 'bai', 'ban', 'bang', 'bao', 'bei', 'ben', 'beng', 'bi', 'bian', 'biao', 'bie', 'bin', 'bing', 'bo', 'bu',
-    'ca', 'cai', 'can', 'cang', 'cao', 'ce', 'cen', 'ceng', 'cha', 'chai', 'chan', 'chang', 'chao', 'che', 'chen', 'cheng', 'chi', 'chong', 'chou',
-    'chu', 'chua', 'chuai', 'chuan', 'chuang', 'chui', 'chun', 'chuo', 'ci', 'cong', 'cou', 'cu', 'cuan', 'cui', 'cun', 'cuo', 'da', 'dai', 'dan',
-    'dang', 'dao', 'de', 'dei', 'den', 'deng', 'di', 'dian', 'diao', 'die', 'ding', 'diu', 'dong', 'dou', 'du', 'duan', 'dui', 'dun', 'duo', 'e', 
-    'ei', 'en', 'eng', 'er', 'fa', 'fan', 'fang', 'fei', 'fen', 'feng', 'fo', 'fou', 'fu', 'ga', 'gai', 'gan', 'gang', 'gao', 'ge', 'gei', 'gen', 
-    'geng', 'gong', 'gou', 'gu', 'gua', 'guai', 'guan', 'guang', 'gui', 'gun', 'guo', 'ha', 'hai', 'han', 'hang', 'hao', 'he', 'hei', 'hen', 'heng', 
-    'hong', 'hou', 'hu', 'hua', 'huai', 'huan', 'huang', 'hui', 'hun', 'huo', 'ji', 'jia', 'jian', 'jiang', 'jiao', 'jie', 'jin', 'jing', 'jiong', 
-    'jiu', 'ju', 'juan', 'jue', 'jun', 'ka', 'kai', 'kan', 'kang', 'kao', 'ke', 'ken', 'keng', 'kong', 'kou', 'ku', 'kua', 'kuai', 'kuan', 'kuang', 
-    'kui', 'kun', 'kuo', 'la', 'lai', 'lan', 'lang', 'lao', 'le', 'lei', 'leng', 'li', 'lia', 'lian', 'liang', 'liao', 'lie', 'lin', 'ling', 'liu', 
-    'lo', 'long', 'lou', 'lu', 'lü', 'luan', 'lüe', 'lun', 'luo', 'ma', 'mai', 'man', 'mang', 'mao', 'me', 'mei', 'men', 'meng', 'mi', 'mian', 'miao', 
-    'mie', 'min', 'ming', 'miu', 'mo', 'mou', 'mu', 'na', 'nai', 'nan', 'nang', 'nao', 'ne', 'nei', 'nen', 'neng', 'ni', 'nian', 'niang', 'niao', 
-    'nie', 'nin', 'ning', 'niu', 'nong', 'nou', 'nu', 'nü', 'nuan', 'nüe', 'nuo', 'o', 'ou', 'pa', 'pai', 'pan', 'pang', 'pao', 'pei', 'pen', 'peng', 
-    'pi', 'pian', 'piao', 'pie', 'pin', 'ping', 'po', 'pou', 'pu', 'qi', 'qia', 'qian', 'qiang', 'qiao', 'qie', 'qin', 'qing', 'qiong', 'qiu', 'qu', 
-    'quan', 'que', 'qun', 'ran', 'rang', 'rao', 're', 'ren', 'reng', 'ri', 'rong', 'rou', 'ru', 'rua', 'ruan', 'rui', 'run', 'ruo', 'sa', 'sai', 
-    'san', 'sang', 'sao', 'se', 'sen', 'seng', 'sha', 'shai', 'shan', 'shang', 'shao', 'she', 'shen', 'sheng', 'shi', 'shou', 'shu', 'shua', 'shuai', 
-    'shuan', 'shuang', 'shui', 'shun', 'shuo', 'si', 'song', 'sou', 'su', 'suan', 'sui', 'sun', 'suo', 'ta', 'tai', 'tan', 'tang', 'tao', 'te', 'teng', 
-    'ti', 'tian', 'tiao', 'tie', 'ting', 'tong', 'tou', 'tu', 'tuan', 'tui', 'tun', 'tuo', 'wa', 'wai', 'wan', 'wang', 'wei', 'wen', 'weng', 'wo', 
-    'wu', 'xi', 'xia', 'xian', 'xiang', 'xiao', 'xie', 'xin', 'xing', 'xiong', 'xiu', 'xu', 'xuan', 'xue', 'xun', 'ya', 'yan', 'yang', 'yao', 'ye', 
-    'yi', 'yin', 'ying', 'yong', 'you', 'yu', 'yuan', 'yue', 'yun', 'za', 'zai', 'zan', 'zang', 'zao', 'ze', 'zei', 'zen', 'zeng', 'zha', 'zhai', 
-    'zhan', 'zhang', 'zhao', 'zhe', 'zhei', 'zhen', 'zheng', 'zhi', 'zhong', 'zhou', 'zhu', 'zhua', 'zhuai', 'zhuan', 'zhuang', 'zhui', 'zhun', 
-    'zhuo', 'zi', 'zong', 'zou', 'zu', 'zuan', 'zui', 'zun', 'zuo'
-  ];
-
-  let practiceTones = [];  // Store selected tones for practice
-  let correctTone = null;  // Store the correct tone for each sound
-  let currentSound = null; // Store the current sound for practice
-  let practiceAllTones = false;
-
-  // Stats structure to store tries and successes for tone pairs and individual tones
-  let stats = {
-    tonePairs: {},  // For tracking 1vs2, 1vs3, etc.
-    individualTones: {
-      1: { correct: 0, wrong: 0 },
-      2: { correct: 0, wrong: 0 },
-      3: { correct: 0, wrong: 0 },
-      4: { correct: 0, wrong: 0 }
-    }
-  };
-
-  // Load stats from localStorage when the page loads
-  function loadStats() {
-    const storedStats = localStorage.getItem('tonePracticeStats');
-    if (storedStats) {
-      stats = JSON.parse(storedStats);
-    }
-  }
-
-  // Save stats to localStorage
-  function saveStats() {
-    localStorage.setItem('tonePracticeStats', JSON.stringify(stats));
-  }
-
-  loadStats(); // Load stats on page load
-
-  // Function to handle tone selection via button clicks
-  function handleToneSelectionChange(event) {
-
-    // Remove 'active' class from all buttons
-    document.querySelectorAll('.tone-btn-sel').forEach(button => {
-      button.classList.remove('active');
-    });
+  <!-- Footer Section -->
+  <div id="footer"></div>
+  <script src="../common/load.js"></script>
+  <script>
+    const sounds = [
+      'a', 'ai', 'an', 'ang', 'ao', 'ba', 'bai', 'ban', 'bang', 'bao', 'bei', 'ben', 'beng', 'bi', 'bian', 'biao', 'bie', 'bin', 'bing', 'bo', 'bu',
+      'ca', 'cai', 'can', 'cang', 'cao', 'ce', 'cen', 'ceng', 'cha', 'chai', 'chan', 'chang', 'chao', 'che', 'chen', 'cheng', 'chi', 'chong', 'chou',
+      'chu', 'chua', 'chuai', 'chuan', 'chuang', 'chui', 'chun', 'chuo', 'ci', 'cong', 'cou', 'cu', 'cuan', 'cui', 'cun', 'cuo', 'da', 'dai', 'dan',
+      'dang', 'dao', 'de', 'dei', 'den', 'deng', 'di', 'dian', 'diao', 'die', 'ding', 'diu', 'dong', 'dou', 'du', 'duan', 'dui', 'dun', 'duo', 'e', 
+      'ei', 'en', 'eng', 'er', 'fa', 'fan', 'fang', 'fei', 'fen', 'feng', 'fo', 'fou', 'fu', 'ga', 'gai', 'gan', 'gang', 'gao', 'ge', 'gei', 'gen', 
+      'geng', 'gong', 'gou', 'gu', 'gua', 'guai', 'guan', 'guang', 'gui', 'gun', 'guo', 'ha', 'hai', 'han', 'hang', 'hao', 'he', 'hei', 'hen', 'heng', 
+      'hong', 'hou', 'hu', 'hua', 'huai', 'huan', 'huang', 'hui', 'hun', 'huo', 'ji', 'jia', 'jian', 'jiang', 'jiao', 'jie', 'jin', 'jing', 'jiong', 
+      'jiu', 'ju', 'juan', 'jue', 'jun', 'ka', 'kai', 'kan', 'kang', 'kao', 'ke', 'ken', 'keng', 'kong', 'kou', 'ku', 'kua', 'kuai', 'kuan', 'kuang', 
+      'kui', 'kun', 'kuo', 'la', 'lai', 'lan', 'lang', 'lao', 'le', 'lei', 'leng', 'li', 'lia', 'lian', 'liang', 'liao', 'lie', 'lin', 'ling', 'liu', 
+      'lo', 'long', 'lou', 'lu', 'lü', 'luan', 'lüe', 'lun', 'luo', 'ma', 'mai', 'man', 'mang', 'mao', 'me', 'mei', 'men', 'meng', 'mi', 'mian', 'miao', 
+      'mie', 'min', 'ming', 'miu', 'mo', 'mou', 'mu', 'na', 'nai', 'nan', 'nang', 'nao', 'ne', 'nei', 'nen', 'neng', 'ni', 'nian', 'niang', 'niao', 
+      'nie', 'nin', 'ning', 'niu', 'nong', 'nou', 'nu', 'nü', 'nuan', 'nüe', 'nuo', 'o', 'ou', 'pa', 'pai', 'pan', 'pang', 'pao', 'pei', 'pen', 'peng', 
+      'pi', 'pian', 'piao', 'pie', 'pin', 'ping', 'po', 'pou', 'pu', 'qi', 'qia', 'qian', 'qiang', 'qiao', 'qie', 'qin', 'qing', 'qiong', 'qiu', 'qu', 
+      'quan', 'que', 'qun', 'ran', 'rang', 'rao', 're', 'ren', 'reng', 'ri', 'rong', 'rou', 'ru', 'rua', 'ruan', 'rui', 'run', 'ruo', 'sa', 'sai', 
+      'san', 'sang', 'sao', 'se', 'sen', 'seng', 'sha', 'shai', 'shan', 'shang', 'shao', 'she', 'shen', 'sheng', 'shi', 'shou', 'shu', 'shua', 'shuai', 
+      'shuan', 'shuang', 'shui', 'shun', 'shuo', 'si', 'song', 'sou', 'su', 'suan', 'sui', 'sun', 'suo', 'ta', 'tai', 'tan', 'tang', 'tao', 'te', 'teng', 
+      'ti', 'tian', 'tiao', 'tie', 'ting', 'tong', 'tou', 'tu', 'tuan', 'tui', 'tun', 'tuo', 'wa', 'wai', 'wan', 'wang', 'wei', 'wen', 'weng', 'wo', 
+      'wu', 'xi', 'xia', 'xian', 'xiang', 'xiao', 'xie', 'xin', 'xing', 'xiong', 'xiu', 'xu', 'xuan', 'xue', 'xun', 'ya', 'yan', 'yang', 'yao', 'ye', 
+      'yi', 'yin', 'ying', 'yong', 'you', 'yu', 'yuan', 'yue', 'yun', 'za', 'zai', 'zan', 'zang', 'zao', 'ze', 'zei', 'zen', 'zeng', 'zha', 'zhai', 
+      'zhan', 'zhang', 'zhao', 'zhe', 'zhei', 'zhen', 'zheng', 'zhi', 'zhong', 'zhou', 'zhu', 'zhua', 'zhuai', 'zhuan', 'zhuang', 'zhui', 'zhun', 
+      'zhuo', 'zi', 'zong', 'zou', 'zu', 'zuan', 'zui', 'zun', 'zuo'
+    ];
   
-    // Add 'active' class to the clicked button
-    event.target.classList.add('active');
+    let practiceTones = [];  // Store selected tones for practice
+    let correctTone = null;  // Store the correct tone for each sound
+    let currentSound = null; // Store the current sound for practice
+    let practiceAllTones = false;
   
-    // Extract tone values from the clicked button's data attributes
-    const tone1 = parseInt(event.target.getAttribute('data-tone1'));
-    const tone2 = parseInt(event.target.getAttribute('data-tone2'));
-    
-    const pairKey = getSortedPairKey(tone1, tone2); // Normalize key
-  
-    if (tone1 !== tone2) {
-      practiceTones = [tone1, tone2];
-      practiceAllTones = false;
-  
-      // Initialize the tone pair stats if not already
-      if (!stats.tonePairs[pairKey]) {
-        stats.tonePairs[pairKey] = { tries: 0, correct: 0 };
+    // Stats structure to store tries and successes for tone pairs and individual tones
+    let stats = {
+      tonePairs: {},  // For tracking 1vs2, 1vs3, etc.
+      individualTones: {
+        1: { correct: 0, wrong: 0 },
+        2: { correct: 0, wrong: 0 },
+        3: { correct: 0, wrong: 0 },
+        4: { correct: 0, wrong: 0 }
       }
+    };
   
-      renderToneButtons();  // Render tone buttons for the selected tones
-      selectRandomTone();    // Start practicing with the first sound
-    } else {
-      alert('Please select two different tones.');
-    }
-  }
-
-
-  // Helper function to get a normalized key for the tone pairs
-  function getSortedPairKey(tone1, tone2) {
-    return tone1 < tone2 ? `${tone1}vs${tone2}` : `${tone2}vs${tone1}`;
-  }
-
-  // Attach event listener to each tone button
-  document.querySelectorAll('.tone-btn-sel').forEach(button => {
-    button.addEventListener('click', handleToneSelectionChange);
-  });
-
-  // Select a random sound and tone from the practiceTones set
-  function selectRandomTone() {
-    const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
-    currentSound = randomSound;
-
-    if (practiceAllTones) {
-      correctTone = Math.floor(Math.random() * 4) + 1;
-    } else {
-      correctTone = practiceTones[Math.floor(Math.random() * practiceTones.length)];
-    }
-  }
-
-  // Play the selected sound with the correct tone
-  function playAudio() {
-    const audioPath = `../version2/audios/${currentSound}${correctTone}.mp3`;
-    const audio = new Audio(audioPath);
-    const resultMsg = document.getElementById('result-msg');
-
-    resultMsg.className = 'alert alert-secondary';
-    resultMsg.innerText = "Listen Carefully!";
-    audio.play();
-  }
-
-  document.getElementById('play-btn').addEventListener('click', playAudio);
-
-  // Handle when a tone button is clicked
-  function handleToneClick(tone) {
-    const resultMsg = document.getElementById('result-msg');
-    
-    const pairKey = getSortedPairKey(practiceTones[0], practiceTones[1]); // Normalize key
-
-    if (!practiceAllTones) {
-      stats.tonePairs[pairKey].tries++;
-    }
-  
-    if (tone === correctTone) {
-      if (!practiceAllTones) {
-        stats.tonePairs[pairKey].correct++;
+    // Load stats from localStorage when the page loads
+    function loadStats() {
+      const storedStats = localStorage.getItem('tonePracticeStats');
+      if (storedStats) {
+        stats = JSON.parse(storedStats);
       }
-      stats.individualTones[correctTone].correct++;
-  
-      resultMsg.className = 'alert alert-success';
-      resultMsg.innerText = 'Correct! You guessed the right tone!';
-    } else {
-      stats.individualTones[correctTone].wrong++;
-  
-      resultMsg.className = 'alert alert-danger';
-      resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
     }
   
-    saveStats(); // Save the updated stats to localStorage
-    renderStats(); // Render the updated stats after each guess
-    selectRandomTone(); // Automatically move to the next sound
-  }
-
-  // Render tone buttons based on the selected practice tones
-  function renderToneButtons() {
-    const toneButtonsDiv = document.getElementById('tone-buttons');
-    toneButtonsDiv.innerHTML = ''; // Clear any existing buttons
+    // Save stats to localStorage
+    function saveStats() {
+      localStorage.setItem('tonePracticeStats', JSON.stringify(stats));
+    }
   
-    let tonesToRender = practiceAllTones ? [1, 2, 3, 4] : practiceTones;
+    loadStats(); // Load stats on page load
   
-    tonesToRender.forEach(tone => {
-      const toneBtn = document.createElement('button');
-      toneBtn.className = 'btn btn-info tone-btn';
-      toneBtn.style.width = '60px'; // Set the button width to 60px
-      toneBtn.style.textAlign = 'center'; // Center the text
+    // Function to handle tone selection via button clicks
+    function handleToneSelectionChange(event) {
   
-      // Map tone numbers to their respective marks
-      const toneMarks = {
-        1: '¯', // First tone (high level)
-        2: '́',  // Second tone (rising)
-        3: '̌',  // Third tone (dipping)
-        4: '̀'   // Fourth tone (falling)
-      };
-  
-      // Set button inner HTML with reduced space
-      toneBtn.innerHTML = `${toneMarks[tone]}<br style="line-height: 0;">${tone}`;
-      
-      toneBtn.addEventListener('click', () => handleToneClick(tone));
-      toneButtonsDiv.appendChild(toneBtn);
-    });
-  
-    toneButtonsDiv.classList.remove('d-none'); // Show tone buttons
-  }
-
-  function renderStats() {
-    const statsDiv = document.getElementById('stats');
-    statsDiv.innerHTML = '<h3>Stats:</h3>';
-    
-    // Create table for tone pair stats
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-bordered', 'text-center');
-  
-    // Create table header row with tone numbers
-    const headerRow = document.createElement('tr');
-    const emptyHeaderCell = document.createElement('th');  // Empty corner cell
-    headerRow.appendChild(emptyHeaderCell);
-  
-    [1, 2, 3, 4].forEach(tone => {
-      const headerCell = document.createElement('th');
-      headerCell.innerText = `Tone ${tone}`;
-      headerRow.appendChild(headerCell);
-    });
-  
-    table.appendChild(headerRow);
-  
-    // Create table rows
-    [1, 2, 3, 4].forEach(initialTone => {
-      const row = document.createElement('tr');
-      const rowHeader = document.createElement('th'); // Row header for tone number
-      rowHeader.innerText = `Tone ${initialTone}`;
-      row.appendChild(rowHeader);
-  
-      [1, 2, 3, 4].forEach(finalTone => {
-        const cell = document.createElement('td');
-  
-        if (initialTone === finalTone) {
-          // Disable cells where tones are the same (1vs1, 2vs2, etc.)
-          cell.style.backgroundColor = '#e9ecef';  // Bootstrap disabled background
-          cell.innerText = 'N/A';
-        } else {
-          const pairKey = getSortedPairKey(initialTone, finalTone); // Normalize key
-          const pairStats = stats.tonePairs[pairKey];
-  
-          if (pairStats) {
-            const percentage = pairStats.tries > 0 ? Math.round((pairStats.correct / pairStats.tries) * 100) : 0;
-  
-            // Set background color based on the percentage of success
-            cell.style.backgroundColor = calculateBackgroundColor(percentage);
-  
-            cell.innerText = `${percentage}% (${pairStats.correct}/${pairStats.tries})`;
-          } else {
-            cell.innerText = '0% (0/0)';
-            cell.style.backgroundColor = calculateBackgroundColor(0);
-          }
-        }
-  
-        row.appendChild(cell);
+      // Remove 'active' class from all buttons
+      document.querySelectorAll('.tone-btn-sel').forEach(button => {
+        button.classList.remove('active');
       });
-  
-      table.appendChild(row);
-    });
-  
-    // Append the table to the stats div
-    statsDiv.innerHTML = '';  // Clear previous content
-    statsDiv.appendChild(table);
-    renderIndividualToneStats();
-  }
-
-  function renderIndividualToneStats() {
-    const statsDiv = document.getElementById('individual-stats');
-    statsDiv.innerHTML = '<h3>Individual Tone Stats:</h3>';
     
-    // Create table for individual tone stats
-    const table = document.createElement('table');
-    table.classList.add('table', 'table-bordered', 'text-center');
-  
-    // Create table header row
-    const headerRow = document.createElement('tr');
-    const headerCellTone = document.createElement('th');
-    headerCellTone.innerText = 'Tone';
-    headerRow.appendChild(headerCellTone);
-  
-    const headerCellPercentage = document.createElement('th');
-    headerCellPercentage.innerText = 'Success Rate';
-    headerRow.appendChild(headerCellPercentage);
-  
-    table.appendChild(headerRow);
-  
-    // Create rows for each individual tone
-    [1, 2, 3, 4].forEach(tone => {
-      const row = document.createElement('tr');
-  
-      // Tone number column
-      const toneCell = document.createElement('td');
-      toneCell.innerText = `Tone ${tone}`;
-      row.appendChild(toneCell);
-  
-      // Calculate success rate
-      const correct = stats.individualTones[tone].correct;
-      const tries = correct + stats.individualTones[tone].wrong;
-      const percentage = tries > 0 ? Math.round((correct / tries) * 100) : 0;
-  
-      // Success rate cell with background color
-      const percentageCell = document.createElement('td');
-      percentageCell.innerText = `${percentage}% (${correct}/${tries})`;
-      percentageCell.style.backgroundColor = calculateBackgroundColor(percentage);
-  
-      row.appendChild(percentageCell);
-  
-      table.appendChild(row);
-    });
-  
-    // Append the table to the individual stats div
-    statsDiv.innerHTML = '';  // Clear previous content
-    statsDiv.appendChild(table);
-  }
-
-
-  function calculateBackgroundColor(percentage) {
-    // Hue ranges from red (0°) to green (120°) in HSL, start green at 80%
-    let hue;
+      // Add 'active' class to the clicked button
+      event.target.classList.add('active');
     
-    if (percentage >= 80) {
-      hue = 120;  // Full green
-    } else {
-      hue = (percentage / 80) * 120;  // Linear scale for red to green up to 80%
+      // Extract tone values from the clicked button's data attributes
+      const tone1 = parseInt(event.target.getAttribute('data-tone1'));
+      const tone2 = parseInt(event.target.getAttribute('data-tone2'));
+      
+      const pairKey = getSortedPairKey(tone1, tone2); // Normalize key
+    
+      if (tone1 !== tone2) {
+        practiceTones = [tone1, tone2];
+        practiceAllTones = false;
+    
+        // Initialize the tone pair stats if not already
+        if (!stats.tonePairs[pairKey]) {
+          stats.tonePairs[pairKey] = { tries: 0, correct: 0 };
+        }
+    
+        renderToneButtons();  // Render tone buttons for the selected tones
+        selectRandomTone();    // Start practicing with the first sound
+      } else {
+        alert('Please select two different tones.');
+      }
     }
   
-    return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
-  }
-  // Add event listener for the Practice All Tones checkbox
-  document.getElementById('practice-all-checkbox').addEventListener('change', function() {
-    const checkbox = document.getElementById('practice-all-checkbox');
-    const toneButtons = document.querySelectorAll('.tone-btn-sel');
   
-    if (checkbox.checked) {
-      // Disable tone selection buttons and activate Practice All mode
-      toneButtons.forEach(button => button.disabled = true);
-      practiceTones = [1, 2, 3, 4];
-      practiceAllTones = true;
-      renderToneButtons();  // Render all tone buttons
-      selectRandomTone();   // Start practicing with all tones
-    } else {
-      // Enable tone selection buttons and deactivate Practice All mode
-      toneButtons.forEach(button => button.disabled = false);
-      practiceAllTones = false;
-      practiceTones = []; // Reset the practice tones
-      document.getElementById('tone-buttons').classList.add('d-none');  // Hide the tone buttons
+    // Helper function to get a normalized key for the tone pairs
+    function getSortedPairKey(tone1, tone2) {
+      return tone1 < tone2 ? `${tone1}vs${tone2}` : `${tone2}vs${tone1}`;
     }
-  });
-
-</script>
+  
+    // Attach event listener to each tone button
+    document.querySelectorAll('.tone-btn-sel').forEach(button => {
+      button.addEventListener('click', handleToneSelectionChange);
+    });
+  
+    // Select a random sound and tone from the practiceTones set
+    function selectRandomTone() {
+      const randomSound = sounds[Math.floor(Math.random() * sounds.length)];
+      currentSound = randomSound;
+  
+      if (practiceAllTones) {
+        correctTone = Math.floor(Math.random() * 4) + 1;
+      } else {
+        correctTone = practiceTones[Math.floor(Math.random() * practiceTones.length)];
+      }
+    }
+  
+    // Play the selected sound with the correct tone
+    function playAudio() {
+      const audioPath = `../version2/audios/${currentSound}${correctTone}.mp3`;
+      const audio = new Audio(audioPath);
+      const resultMsg = document.getElementById('result-msg');
+  
+      resultMsg.className = 'alert alert-secondary';
+      resultMsg.innerText = "Listen Carefully!";
+      audio.play();
+    }
+  
+    document.getElementById('play-btn').addEventListener('click', playAudio);
+  
+    // Handle when a tone button is clicked
+    function handleToneClick(tone) {
+      const resultMsg = document.getElementById('result-msg');
+      
+      const pairKey = getSortedPairKey(practiceTones[0], practiceTones[1]); // Normalize key
+  
+      if (!practiceAllTones) {
+        stats.tonePairs[pairKey].tries++;
+      }
+    
+      if (tone === correctTone) {
+        if (!practiceAllTones) {
+          stats.tonePairs[pairKey].correct++;
+        }
+        stats.individualTones[correctTone].correct++;
+    
+        resultMsg.className = 'alert alert-success';
+        resultMsg.innerText = 'Correct! You guessed the right tone!';
+      } else {
+        stats.individualTones[correctTone].wrong++;
+    
+        resultMsg.className = 'alert alert-danger';
+        resultMsg.innerText = `Wrong! The correct tone was ${correctTone}.`;
+      }
+    
+      saveStats(); // Save the updated stats to localStorage
+      renderStats(); // Render the updated stats after each guess
+      selectRandomTone(); // Automatically move to the next sound
+    }
+  
+    // Render tone buttons based on the selected practice tones
+    function renderToneButtons() {
+      const toneButtonsDiv = document.getElementById('tone-buttons');
+      toneButtonsDiv.innerHTML = ''; // Clear any existing buttons
+    
+      let tonesToRender = practiceAllTones ? [1, 2, 3, 4] : practiceTones;
+    
+      tonesToRender.forEach(tone => {
+        const toneBtn = document.createElement('button');
+        toneBtn.className = 'btn btn-info tone-btn';
+        toneBtn.style.width = '60px'; // Set the button width to 60px
+        toneBtn.style.textAlign = 'center'; // Center the text
+    
+        // Map tone numbers to their respective marks
+        const toneMarks = {
+          1: '¯', // First tone (high level)
+          2: '́',  // Second tone (rising)
+          3: '̌',  // Third tone (dipping)
+          4: '̀'   // Fourth tone (falling)
+        };
+    
+        // Set button inner HTML with reduced space
+        toneBtn.innerHTML = `${toneMarks[tone]}<br style="line-height: 0;">${tone}`;
+        
+        toneBtn.addEventListener('click', () => handleToneClick(tone));
+        toneButtonsDiv.appendChild(toneBtn);
+      });
+    
+      toneButtonsDiv.classList.remove('d-none'); // Show tone buttons
+    }
+  
+    function renderStats() {
+      const statsDiv = document.getElementById('stats');
+      statsDiv.innerHTML = '<h3>Stats:</h3>';
+      
+      // Create table for tone pair stats
+      const table = document.createElement('table');
+      table.classList.add('table', 'table-bordered', 'text-center');
+    
+      // Create table header row with tone numbers
+      const headerRow = document.createElement('tr');
+      const emptyHeaderCell = document.createElement('th');  // Empty corner cell
+      headerRow.appendChild(emptyHeaderCell);
+    
+      [1, 2, 3, 4].forEach(tone => {
+        const headerCell = document.createElement('th');
+        headerCell.innerText = `Tone ${tone}`;
+        headerRow.appendChild(headerCell);
+      });
+    
+      table.appendChild(headerRow);
+    
+      // Create table rows
+      [1, 2, 3, 4].forEach(initialTone => {
+        const row = document.createElement('tr');
+        const rowHeader = document.createElement('th'); // Row header for tone number
+        rowHeader.innerText = `Tone ${initialTone}`;
+        row.appendChild(rowHeader);
+    
+        [1, 2, 3, 4].forEach(finalTone => {
+          const cell = document.createElement('td');
+    
+          if (initialTone === finalTone) {
+            // Disable cells where tones are the same (1vs1, 2vs2, etc.)
+            cell.style.backgroundColor = '#e9ecef';  // Bootstrap disabled background
+            cell.innerText = 'N/A';
+          } else {
+            const pairKey = getSortedPairKey(initialTone, finalTone); // Normalize key
+            const pairStats = stats.tonePairs[pairKey];
+    
+            if (pairStats) {
+              const percentage = pairStats.tries > 0 ? Math.round((pairStats.correct / pairStats.tries) * 100) : 0;
+    
+              // Set background color based on the percentage of success
+              cell.style.backgroundColor = calculateBackgroundColor(percentage);
+    
+              cell.innerText = `${percentage}% (${pairStats.correct}/${pairStats.tries})`;
+            } else {
+              cell.innerText = '0% (0/0)';
+              cell.style.backgroundColor = calculateBackgroundColor(0);
+            }
+          }
+    
+          row.appendChild(cell);
+        });
+    
+        table.appendChild(row);
+      });
+    
+      // Append the table to the stats div
+      statsDiv.innerHTML = '';  // Clear previous content
+      statsDiv.appendChild(table);
+      renderIndividualToneStats();
+    }
+  
+    function renderIndividualToneStats() {
+      const statsDiv = document.getElementById('individual-stats');
+      statsDiv.innerHTML = '<h3>Individual Tone Stats:</h3>';
+      
+      // Create table for individual tone stats
+      const table = document.createElement('table');
+      table.classList.add('table', 'table-bordered', 'text-center');
+    
+      // Create table header row
+      const headerRow = document.createElement('tr');
+      const headerCellTone = document.createElement('th');
+      headerCellTone.innerText = 'Tone';
+      headerRow.appendChild(headerCellTone);
+    
+      const headerCellPercentage = document.createElement('th');
+      headerCellPercentage.innerText = 'Success Rate';
+      headerRow.appendChild(headerCellPercentage);
+    
+      table.appendChild(headerRow);
+    
+      // Create rows for each individual tone
+      [1, 2, 3, 4].forEach(tone => {
+        const row = document.createElement('tr');
+    
+        // Tone number column
+        const toneCell = document.createElement('td');
+        toneCell.innerText = `Tone ${tone}`;
+        row.appendChild(toneCell);
+    
+        // Calculate success rate
+        const correct = stats.individualTones[tone].correct;
+        const tries = correct + stats.individualTones[tone].wrong;
+        const percentage = tries > 0 ? Math.round((correct / tries) * 100) : 0;
+    
+        // Success rate cell with background color
+        const percentageCell = document.createElement('td');
+        percentageCell.innerText = `${percentage}% (${correct}/${tries})`;
+        percentageCell.style.backgroundColor = calculateBackgroundColor(percentage);
+    
+        row.appendChild(percentageCell);
+    
+        table.appendChild(row);
+      });
+    
+      // Append the table to the individual stats div
+      statsDiv.innerHTML = '';  // Clear previous content
+      statsDiv.appendChild(table);
+    }
+  
+  
+    function calculateBackgroundColor(percentage) {
+      // Hue ranges from red (0°) to green (120°) in HSL, start green at 80%
+      let hue;
+      
+      if (percentage >= 80) {
+        hue = 120;  // Full green
+      } else {
+        hue = (percentage / 80) * 120;  // Linear scale for red to green up to 80%
+      }
+    
+      return `hsl(${hue}, 70%, 80%)`;  // Light color with 70% saturation and 80% lightness
+    }
+    // Add event listener for the Practice All Tones checkbox
+    document.getElementById('practice-all-checkbox').addEventListener('change', function() {
+      const checkbox = document.getElementById('practice-all-checkbox');
+      const toneButtons = document.querySelectorAll('.tone-btn-sel');
+    
+      if (checkbox.checked) {
+        // Disable tone selection buttons and activate Practice All mode
+        toneButtons.forEach(button => button.disabled = true);
+        practiceTones = [1, 2, 3, 4];
+        practiceAllTones = true;
+        renderToneButtons();  // Render all tone buttons
+        selectRandomTone();   // Start practicing with all tones
+      } else {
+        // Enable tone selection buttons and deactivate Practice All mode
+        toneButtons.forEach(button => button.disabled = false);
+        practiceAllTones = false;
+        practiceTones = []; // Reset the practice tones
+        document.getElementById('tone-buttons').classList.add('d-none');  // Hide the tone buttons
+      }
+    });
+  
+  </script>
 
 </body>
 </html>
