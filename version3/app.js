@@ -1,5 +1,5 @@
 // List of words with tone pairs (same as before)
-const wordSet = [
+var wordSet = [
   // 1,1 Tones
   { "tones": "1,1", "word": "中心", "pinyin": "zhōng xīn", "pinyin_no_tones": "zhong xin", "hsk": "1" },
   { "tones": "1,1", "word": "飞机", "pinyin": "fēijī", "pinyin_no_tones": "fei ji", "hsk": "1" },
@@ -256,8 +256,26 @@ function renderToneOptions() {
 
   initialTones.forEach(initialTone => {
     const row = document.createElement('tr');
-    
-    finalTones.forEach(finalTone => {
+
+    finalTones.forEach((finalTone, index) => {
+      // Handle 2,3 with rowspan
+      if (initialTone === "2" && finalTone === "3") {
+        const mergedCell = document.createElement('td');
+        mergedCell.innerText = '2,3';
+        mergedCell.classList.add('table-cell');
+        mergedCell.classList.add('align-middle');
+        mergedCell.rowSpan = 2; // Span two rows
+        mergedCell.onclick = () => checkAnswer('2,3');
+        row.appendChild(mergedCell);
+        return; // Skip creating a regular cell for this pair
+      }
+
+      // Skip creating the 3,3 cell as it is merged into 2,3
+      if (initialTone === "3" && finalTone === "3") {
+        return;
+      }
+
+      // Create regular cells for other tone pairs
       const tonePair = `${initialTone},${finalTone}`;
       const cell = document.createElement('td');
       cell.innerText = tonePair;
@@ -274,11 +292,17 @@ function checkAnswer(selectedTone) {
   if (isAnswerSelected) return; // Prevent further answers
 
   const resultMsg = document.getElementById('result-msg');
-  
+
   // Update stats
   const data = stats[selectedTone];
   data.tries += 1;
-  if (selectedTone === selectedWord.tones) {
+
+  // Allow 3,3 to be valid for 2,3
+  const isCorrect =
+    selectedTone === selectedWord.tones ||
+    (selectedTone === "2,3" && selectedWord.tones === "3,3");
+
+  if (isCorrect) {
     data.success += 1;
     resultMsg.className = 'alert alert-success';
     resultMsg.innerText = 'Correct! You guessed the right tone pair!';
@@ -288,7 +312,7 @@ function checkAnswer(selectedTone) {
   }
 
   resultMsg.classList.remove('d-none');
-  
+
   // Disable further answers and enable "Next Word" button
   isAnswerSelected = true;
   disableToneSelection();
